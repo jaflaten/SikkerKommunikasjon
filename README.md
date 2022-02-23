@@ -1,3 +1,5 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/jaflaten/sikkerkommunikasjon/badge)](https://www.codefactor.io/repository/github/jaflaten/sikkerkommunikasjon)
+
 # SikkerKommunikasjon (working title)
 Schema solution for citizen to contact companies in a secure manner using an existing transport infrastructure(eFormidling) with end-to-end encryption.
 
