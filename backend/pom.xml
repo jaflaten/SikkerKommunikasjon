@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>no.hvl.dat251.v22</groupId>
-    <artifactId>SikkerKommunikasjon</artifactId>
+    <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>SikkerKommunikasjon</name>
     <description>Schema solution for citizen to contact companies in a secure manner using an existing transport
