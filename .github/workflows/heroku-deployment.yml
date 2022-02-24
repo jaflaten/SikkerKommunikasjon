@@ -31,5 +31,5 @@ jobs:
         # Email that you use with heroku
         heroku_email: ${{secrets.HEROKU_EMAIL}}
         # The appname to use for deploying/updating
-        heroku_app_name: ${{secrets.HEROKU_API_NAME}}
+        heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
 
