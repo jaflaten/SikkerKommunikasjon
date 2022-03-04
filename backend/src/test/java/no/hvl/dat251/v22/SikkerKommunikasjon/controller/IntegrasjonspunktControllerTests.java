@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(IntegrasjonspunktController.class)
@@ -81,5 +82,19 @@ public class IntegrasjonspunktControllerTests {
         mockMvc.perform(get("/api/v1/capabilities/{orgnr}", orgnr))
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
+    }
+
+    @Test
+    public void sendMultipartMessageShouldReturn200Ok() throws Exception {
+        mockMvc.perform(post("/api/v1/messages/multipart")
+                        .param("ssn", "120592640214")
+                        .param("name", "Ola Nordmann")
+                        .param("email", "norsk.email@difi.no")
+                        .param("receiver", "507369790")
+                        .param("title", "Manglende snø i Bergen")
+                        .param("content", "Det er ikke nok snø i Bergen!")
+                        .param("isSensitive", "false")
+                        .param("file", "klage.pdf"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }

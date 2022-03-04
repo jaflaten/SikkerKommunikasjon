@@ -6,11 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.hvl.dat251.v22.SikkerKommunikasjon.service.IntegrasjonspunktService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.util.Optional;
 
 @RestController
@@ -38,5 +36,17 @@ public class IntegrasjonspunktController {
         }
 
         return capabilities.isPresent() ? ResponseEntity.ok(capabilities.get()) : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/messages/multipart")
+    public ResponseEntity<?> sendMultipartMessage(@RequestParam String ssn, @RequestParam String name,
+                                                  @RequestParam String email, @RequestParam String receiver,
+                                                  @RequestParam String title, @RequestParam String content,
+                                                  @RequestParam Boolean isSensitive, @RequestParam File file) {
+
+        service.sendMultipartMessage(ssn, name, email, receiver, title, content, isSensitive, file);
+
+        // Unfinished - return empty response
+        return ResponseEntity.ok().build();
     }
 }
