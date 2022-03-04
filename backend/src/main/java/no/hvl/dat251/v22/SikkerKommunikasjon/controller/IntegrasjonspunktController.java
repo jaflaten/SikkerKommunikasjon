@@ -38,8 +38,5 @@ public class IntegrasjonspunktController {
         }
 
         return capabilities.isPresent() ? ResponseEntity.ok(capabilities.get()) : ResponseEntity.notFound().build();
-
     }
-
-
 }

@@ -31,9 +31,9 @@ public class IntegrasjonspunktControllerTests {
     @MockBean
     IntegrasjonspunktService service;
 
-    String orgnr;
-    String wrongInputOrgnr;
-    String notExistingOrgnr;
+    private final String orgnr = "123456789";
+    private final String wrongInputOrgnr = "1234567891";
+    private final String notExistingOrgnr = "999888777";
 
     Optional<JsonNode> jsonOptional;
 
@@ -42,10 +42,6 @@ public class IntegrasjonspunktControllerTests {
 
     @Before
     public void setup() throws JsonProcessingException {
-        orgnr = "123456789";
-        wrongInputOrgnr = "1234567891";
-        notExistingOrgnr = "999888777";
-
         json = "{ \"process\" : \"arkivmelding\", \"serviceIdentifier\" : \"DPV\" }";
         jsonOptional = Optional.of(mapper.readTree(json));
     }
@@ -86,6 +82,4 @@ public class IntegrasjonspunktControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
     }
-
-
 }
