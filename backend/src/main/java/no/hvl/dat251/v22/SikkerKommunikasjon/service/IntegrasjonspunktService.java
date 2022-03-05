@@ -8,16 +8,25 @@ import lombok.extern.slf4j.Slf4j;
 import no.difi.meldingsutveksling.domain.sbdh.*;
 import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonProperties;
 import no.hvl.dat251.v22.SikkerKommunikasjon.entities.ArkivMelding;
+import no.hvl.dat251.v22.SikkerKommunikasjon.entities.FormData;
 import no.hvl.dat251.v22.SikkerKommunikasjon.utility.ArkivMeldingUtil;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 import java.util.Set;
@@ -35,13 +44,8 @@ public class IntegrasjonspunktService {
 
 
     public Optional<JsonNode> getCapabilities(String orgnr) throws JsonProcessingException {
-        URI integrasjonspunktURI = UriComponentsBuilder.fromUriString(properties.getIntegrasjonspunkt().getURL())
-                .path("capabilities/" + orgnr)
-                .build()
-                .toUri();
-
         String capabilities = webClient.get()
-                .uri(integrasjonspunktURI)
+                .uri(getCapabilitiesURI(orgnr))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
                 .bodyToMono(String.class)
@@ -51,34 +55,40 @@ public class IntegrasjonspunktService {
 
     }
 
-    public Optional<JsonNode> sendMultipartMessage(String ssn, String name, String email, String receiver, String title,
-                                                 String content, Boolean isSensitive, File file) {
+    public Optional<JsonNode> createAndSendMultipartMessage(FormData formData, File attachment) throws IOException {
 
+        log.info("inside service before arkivmelding");
+        String formDataJSON = mapper.writeValueAsString(formData);
         StandardBusinessDocument document = new StandardBusinessDocument();
+        document.setStandardBusinessDocumentHeader(createSBDHeader(formData.getReceiver()));
 
-        document.setStandardBusinessDocumentHeader(createSBDHeader(receiver));
+        Optional<ArkivMelding> arkivmeldingXML = getArkivmeldingXML();
+        if (arkivmeldingXML.isPresent()) {
+            document.setAny(arkivmeldingXML.get());
 
-        ArkivMeldingUtil util = new ArkivMeldingUtil();
-        String xml;
-        Optional<String> s = util.arkivMeldingXMLToString();
+            MultipartFile multipartFile = new MockMultipartFile(
+                    "attachment", attachment.getName(), "application/pdf", IOUtils.toByteArray(new FileInputStream(attachment)));
+            MultipartBodyBuilder builder = new MultipartBodyBuilder();
+            builder.part("attachment", multipartFile.getResource(), MediaType.APPLICATION_PDF);
+            builder.part("sbd", document);
+            builder.part("form", formDataJSON);
 
-        if(s.isPresent()) {
-            xml = s.get();
+            MultiValueMap<String, HttpEntity<?>> multiPartMessageBody = builder.build();
+
+            String response = webClient.post()
+                    .uri(getMultipartURI())
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .body(BodyInserters.fromMultipartData(multiPartMessageBody))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            return Optional.of(mapper.readTree(response));
         } else {
-            log.warn("ArkivMelding XML is empty, cannot create and send message!");
             return Optional.empty();
         }
 
-        ArkivMelding melding = new ArkivMelding();
-        melding.setMainDocument(xml);
-
-        document.setAny(melding);
-
-        MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        // builder.part("file", multipartFile.getResource());
-
-        // Unfinished - return empty
-        return Optional.empty();
     }
 
     public StandardBusinessDocumentHeader createSBDHeader(String receiver) {
@@ -120,5 +130,32 @@ public class IntegrasjonspunktService {
         header.setHeaderVersion("1.0");
 
         return header;
+    }
+
+    public URI getMultipartURI() {
+        return UriComponentsBuilder.fromUriString(properties.getIntegrasjonspunkt().getURL())
+                .path("messages/out/multipart")
+                .build()
+                .toUri();
+    }
+
+    public URI getCapabilitiesURI(String orgnr) {
+        return UriComponentsBuilder.fromUriString(properties.getIntegrasjonspunkt().getURL())
+                .path("capabilities/" + orgnr)
+                .build()
+                .toUri();
+    }
+
+    public Optional<ArkivMelding> getArkivmeldingXML() {
+        Optional<String> arkivmeldingString = new ArkivMeldingUtil().arkivMeldingXMLToString();
+        ArkivMelding arkivMelding = new ArkivMelding();
+
+        if (arkivmeldingString.isPresent()) {
+            arkivMelding.setMainDocument(arkivmeldingString.get());
+            return Optional.of(arkivMelding);
+        } else {
+            log.warn("ArkivMelding XML is empty, cannot create and send message!");
+            return Optional.empty();
+        }
     }
 }

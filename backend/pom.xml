@@ -19,6 +19,7 @@
 		<java.version>11</java.version>
 		<cucumber.version>5.0.0</cucumber.version>
 		<junit-jupiter.version>5.8.2</junit-jupiter.version>
+        <commons.io.version>2.11.0</commons.io.version>
 	</properties>
     <dependencies>
 		<!-- project reactor -->
@@ -62,13 +63,25 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>5.3.16</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <!--<scope>provided</scope>-->
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+
 
         <!-- Junit -->
         <dependency>

@@ -17,6 +17,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -41,10 +44,13 @@ public class IntegrasjonspunktControllerTests {
     String json;
     ObjectMapper mapper = new ObjectMapper();
 
+    File testfile;
+
     @Before
-    public void setup() throws JsonProcessingException {
+    public void setup() throws JsonProcessingException, URISyntaxException {
         json = "{ \"process\" : \"arkivmelding\", \"serviceIdentifier\" : \"DPV\" }";
         jsonOptional = Optional.of(mapper.readTree(json));
+        testfile = new File(String.valueOf(Paths.get(ClassLoader.getSystemResource("arkivmelding.xml").toString())));
     }
 
     @Test
@@ -94,7 +100,7 @@ public class IntegrasjonspunktControllerTests {
                         .param("title", "Manglende snø i Bergen")
                         .param("content", "Det er ikke nok snø i Bergen!")
                         .param("isSensitive", "false")
-                        .param("file", "klage.pdf"))
+                        .param("attachment", "blabla"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
