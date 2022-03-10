@@ -5,4 +5,4 @@ Schema solution for citizen to contact companies in a secure manner using an exi
 
 This is a student project at Høgskulen på Vestlandet in spring 2022. The course is DAT251 Modern Software Development Methods
 
-Don't mind me
+Don't mind mehe
