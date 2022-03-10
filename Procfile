@@ -1,2 +1,2 @@
 api: java -jar -Dserver.port=$PORT backend/target/backend.jar
-web: npm run start
+web: cd frontend && npm run start
