@@ -8,4 +8,12 @@ module.exports = function (app) {
       changeOrigin: true,
     })
   );
+
+  app.use(
+    "/apiNone",
+    createProxyMiddleware({
+      target: "http://localhost:3032",
+      changeOrigin: true,
+    })
+  );
 };
