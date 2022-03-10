@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "[![CodeFactor](https://www.codefactor.io/repository/github/jaflaten/sikkerkommunikasjon/badge)](https://www.codefactor.io/repository/github/jaflaten/sikkerkommunikasjon) <a href=\"https://zenhub.com\"><img src=\"https://dxssrr2j0sq4w.cloudfront.net/3.2.0/img/external/zenhub-badge.png\" alt=\"ZenHub logo\"></a>",
   "main": "index.js",
+  "proxy": "http://locahost:3001",
   "scripts": {
     "postinstall": "cd frontend && npm install",
     "start": "cd frontend && npm start"
