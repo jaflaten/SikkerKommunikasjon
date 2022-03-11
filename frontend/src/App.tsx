@@ -2,11 +2,12 @@ import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
-  fetch("http://localhost:3001/api", { mode: "no-cors" })
+  fetch("http://localhost:3001/api/v1/capabilities/991825827")
     .then((res) => res)
     .then((result) => {
-      console.log(result);
-    });
+      result.json().then((res) => console.log(res));
+    })
+    .catch(console.log);
 
   return (
     <div className="App">
