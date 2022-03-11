@@ -2,7 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
-  fetch("http://localhost:1337/api", { mode: "no-cors" })
+  fetch("http://localhost:3001/api", { mode: "no-cors" })
     .then((res) => res)
     .then((result) => {
       console.log(result);
