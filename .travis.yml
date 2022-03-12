@@ -9,7 +9,7 @@ before_deploy:
 deploy:
   - provider: heroku
     api_key: $HEROKU_API_KEY
-    app: $sk-staging-frontend
+    app: sk-staging-frontend
     file_glob: true
     file: "frontend/*"
     on:
@@ -18,7 +18,7 @@ deploy:
       
   - provider: heroku
     api_key: $HEROKU_API_KEY
-    app: $sk-staging-backend
+    app: sk-staging-backend
     file_glob: true
     file: "backend/*"
     on:
@@ -27,7 +27,7 @@ deploy:
 
   - provider: heroku
     api_key: $HEROKU_API_KEY
-    app: $sk-prod-backend
+    app: sk-prod-backend
     file_glob: true
     file: "backend/*"
     on:
@@ -36,7 +36,7 @@ deploy:
 
   - provider: heroku
     api_key: $HEROKU_API_KEY
-    app: $sk-prod-frontend
+    app: sk-prod-frontend
     file_glob: true
     file: "frontend/*"
     on:
