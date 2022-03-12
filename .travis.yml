@@ -9,15 +9,36 @@ before_deploy:
 deploy:
   - provider: heroku
     api_key: $HEROKU_API_KEY
-    app: $DEVAPP_NAME
+    app: $sk-staging-frontend
+    file_glob: true
+    file: "frontend/*"
+    on:
+      repo: jaflaten/SikkerKommunikasjon
+      branch: development
+      
+  - provider: heroku
+    api_key: $HEROKU_API_KEY
+    app: $sk-staging-backend
+    file_glob: true
+    file: "backend/*"
     on:
       repo: jaflaten/SikkerKommunikasjon
       branch: development
 
   - provider: heroku
     api_key: $HEROKU_API_KEY
-    app: $PRODAPP_NAME
+    app: $sk-prod-backend
+    file_glob: true
+    file: "backend/*"
     on:
       repo: jaflaten/SikkerKommunikasjon
       branch: main
 
+  - provider: heroku
+    api_key: $HEROKU_API_KEY
+    app: $sk-prod-frontend
+    file_glob: true
+    file: "frontend/*"
+    on:
+      repo: jaflaten/SikkerKommunikasjon
+      branch: main
