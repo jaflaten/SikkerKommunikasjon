@@ -26,6 +26,7 @@ deploy:
     app: sk-staging-backend
     file_glob: true
     file: "backend/*"
+    script: java -jar -Dserver.port=3001 backend/target/backend.jar
     on:
       repo: jaflaten/SikkerKommunikasjon
       branch: development
@@ -35,6 +36,7 @@ deploy:
     app: sk-prod-backend
     file_glob: true
     file: "backend/*"
+    script: java -jar -Dserver.port=3001 backend/target/backend.jar
     on:
       repo: jaflaten/SikkerKommunikasjon
       branch: main
