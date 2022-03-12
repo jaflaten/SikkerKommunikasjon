@@ -1,4 +1,11 @@
-language: java
+matrix:
+  include:
+    - language: java
+    - language: node.js
+      node_js: "17.0"
+      script:
+        - npm install
+
 cache:
   directories:
   - $HOME/.m2
@@ -12,6 +19,7 @@ deploy:
     app: sk-staging-frontend
     file_glob: true
     file: "frontend/*"
+    script: npm start
     on:
       repo: jaflaten/SikkerKommunikasjon
       branch: development
@@ -39,6 +47,7 @@ deploy:
     app: sk-prod-frontend
     file_glob: true
     file: "frontend/*"
+    script: npm start
     on:
       repo: jaflaten/SikkerKommunikasjon
       branch: main
