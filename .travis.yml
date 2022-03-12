@@ -1,10 +1,7 @@
-matrix:
-  include:
-    - language: java
-    - language: node.js
-      node_js: "17.0"
-      script:
-        - npm install
+language: java
+
+before-install:
+  - nvm install 0.17
 
 cache:
   directories:
