@@ -1,7 +1,7 @@
 language: java
 
 before-install:
-  - nvm install 0.17
+  - npm i -g npm@0.17
 
 cache:
   directories:
