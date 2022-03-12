@@ -1,4 +1,8 @@
 language: java
+
+before-install:
+  - npm install
+
 cache:
   directories:
   - $HOME/.m2
@@ -9,14 +13,40 @@ before_deploy:
 deploy:
   - provider: heroku
     api_key: $HEROKU_API_KEY
-    app: $DEVAPP_NAME
+    app: sk-staging-frontend
+    file_glob: true
+    file: "frontend/*"
+    script: npm start
+    on:
+      repo: jaflaten/SikkerKommunikasjon
+      branch: development
+      
+  - provider: heroku
+    api_key: $HEROKU_API_KEY
+    app: sk-staging-backend
+    file_glob: true
+    file: "backend/*"
+    script: java -jar -Dserver.port=3001 backend/target/backend.jar
     on:
       repo: jaflaten/SikkerKommunikasjon
       branch: development
 
   - provider: heroku
     api_key: $HEROKU_API_KEY
-    app: $PRODAPP_NAME
+    app: sk-prod-backend
+    file_glob: true
+    file: "backend/*"
+    script: java -jar -Dserver.port=3001 backend/target/backend.jar
+    on:
+      repo: jaflaten/SikkerKommunikasjon
+      branch: main
+
+  - provider: heroku
+    api_key: $HEROKU_API_KEY
+    app: sk-prod-frontend
+    file_glob: true
+    file: "frontend/*"
+    script: npm start
     on:
       repo: jaflaten/SikkerKommunikasjon
       branch: main

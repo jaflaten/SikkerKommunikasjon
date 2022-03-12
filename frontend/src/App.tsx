@@ -2,6 +2,13 @@ import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
+  fetch("/api/v1/capabilities/991825827")
+    .then((res) => res)
+    .then((result) => {
+      result.json().then((res) => console.log(res));
+    })
+    .catch(console.log);
+
   return (
     <div className="App">
       <header className="App-header">

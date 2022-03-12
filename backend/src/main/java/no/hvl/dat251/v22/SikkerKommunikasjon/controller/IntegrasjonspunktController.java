@@ -6,21 +6,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.hvl.dat251.v22.SikkerKommunikasjon.service.IntegrasjonspunktService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RequestMapping("/api/v1")
 public class IntegrasjonspunktController {
 
     private final IntegrasjonspunktService service;
 
+    @CrossOrigin
     @GetMapping("/capabilities/{orgnr}")
     public ResponseEntity<?> getCapabilitiesOrgnr(@PathVariable String orgnr) {
         log.info("Looking up capabilities for organization: " + orgnr);
