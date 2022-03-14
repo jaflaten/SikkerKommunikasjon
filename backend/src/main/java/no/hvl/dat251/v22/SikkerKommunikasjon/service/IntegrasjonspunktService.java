@@ -10,13 +10,11 @@ import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonPropertie
 import no.hvl.dat251.v22.SikkerKommunikasjon.entities.ArkivMelding;
 import no.hvl.dat251.v22.SikkerKommunikasjon.entities.FormData;
 import no.hvl.dat251.v22.SikkerKommunikasjon.utility.ArkivMeldingUtil;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,8 +22,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
@@ -55,7 +51,7 @@ public class IntegrasjonspunktService {
 
     }
 
-    public Optional<JsonNode> createAndSendMultipartMessage(FormData formData, File attachment) throws IOException {
+    public Optional<JsonNode> createAndSendMultipartMessage(FormData formData, MultipartFile multipartFile) throws IOException {
 
         log.info("inside service before arkivmelding");
         String formDataJSON = mapper.writeValueAsString(formData);
@@ -66,8 +62,6 @@ public class IntegrasjonspunktService {
         if (arkivmeldingXML.isPresent()) {
             document.setAny(arkivmeldingXML.get());
 
-            MultipartFile multipartFile = new MockMultipartFile(
-                    "attachment", attachment.getName(), "application/pdf", IOUtils.toByteArray(new FileInputStream(attachment)));
             MultipartBodyBuilder builder = new MultipartBodyBuilder();
             builder.part("attachment", multipartFile.getResource(), MediaType.APPLICATION_PDF);
             builder.part("sbd", document);

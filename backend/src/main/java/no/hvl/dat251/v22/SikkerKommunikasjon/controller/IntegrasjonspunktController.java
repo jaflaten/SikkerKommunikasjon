@@ -8,8 +8,8 @@ import no.hvl.dat251.v22.SikkerKommunikasjon.entities.FormData;
 import no.hvl.dat251.v22.SikkerKommunikasjon.service.IntegrasjonspunktService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -42,12 +42,11 @@ public class IntegrasjonspunktController {
         return capabilities.isPresent() ? ResponseEntity.ok(capabilities.get()) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/messages/multipart")
-    public ResponseEntity<?> sendMultipartMessage(@RequestParam String ssn, @RequestParam String name,
-                                                  @RequestParam String email, @RequestParam String receiver,
-                                                  @RequestParam String title, @RequestParam String content,
-                                                  @RequestParam Boolean isSensitive, @RequestParam File attachment) throws IOException {
-
+    @PostMapping(value = "/messages/multipart", consumes = "multipart/form-data")
+    public ResponseEntity<?> sendMultipartMessage(String ssn, String name,
+                                                  String email, String receiver,
+                                                  String title, String content,
+                                                  Boolean isSensitive, @RequestParam("attachment") MultipartFile attachment) throws IOException {
 
         log.info("multipart controller called");
         FormData formData = new FormData(ssn, name, email, receiver, title, content, isSensitive);
@@ -55,6 +54,5 @@ public class IntegrasjonspunktController {
         Optional<JsonNode> response = service.createAndSendMultipartMessage(formData, attachment);
 
         return response.isPresent() ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
-
     }
 }
