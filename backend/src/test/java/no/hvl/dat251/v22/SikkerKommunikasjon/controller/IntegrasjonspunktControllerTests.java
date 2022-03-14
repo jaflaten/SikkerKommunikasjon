@@ -16,16 +16,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(IntegrasjonspunktController.class)
@@ -41,28 +38,26 @@ public class IntegrasjonspunktControllerTests {
     ObjectMapper objectMapper;
 
 
-
     private final String orgnr = "123456789";
     private final String wrongInputOrgnr = "1234567891";
     private final String notExistingOrgnr = "999888777";
 
     Optional<JsonNode> jsonOptional;
     FormData formData;
-    MockMultipartFile attachment;
 
     String json;
     ObjectMapper mapper = new ObjectMapper();
 
-    File testfile;
+    MockMultipartFile mockMultipartFile;
 
     @Before
-    public void setup() throws JsonProcessingException, URISyntaxException {
+    public void setup() throws JsonProcessingException {
         json = "{ \"process\" : \"arkivmelding\", \"serviceIdentifier\" : \"DPV\" }";
         jsonOptional = Optional.of(mapper.readTree(json));
-        testfile = new File(String.valueOf(Paths.get(ClassLoader.getSystemResource("arkivmelding.xml").toString())));
-        formData = new FormData("12345678910", "Kari Nordmann", "kari@nordmann.no", orgnr,
-                "No snow in Bergen in march", "I want more snow in Bergen to go skiing", false);
+        formData = new FormData("120592640214", "Ola Nordmann", "norsk.email@difi.no", "507369790",
+                "Manglende snø i Bergen", "Det er ikke nok snø i Bergen!", false);
 
+        mockMultipartFile = new MockMultipartFile("attachment", "test.pdf", "application/pdf", "some content".getBytes());
     }
 
     @Test
@@ -104,16 +99,32 @@ public class IntegrasjonspunktControllerTests {
 
     @Test
     public void sendMultipartMessageShouldReturn200Ok() throws Exception {
-        when(service.createAndSendMultipartMessage(formData, attachment)).thenReturn(jsonOptional);
-        mockMvc.perform(post("/api/v1/messages/multipart")
+        when(service.createAndSendMultipartMessage(formData, mockMultipartFile)).thenReturn(jsonOptional);
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/messages/multipart")
+                        .file(mockMultipartFile)
                         .param("ssn", "120592640214")
                         .param("name", "Ola Nordmann")
                         .param("email", "norsk.email@difi.no")
                         .param("receiver", "507369790")
                         .param("title", "Manglende snø i Bergen")
                         .param("content", "Det er ikke nok snø i Bergen!")
-                        .param("isSensitive", "false")
-                        .param("attachment", "blabla"))
+                        .param("isSensitive", "false"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void sendMultipartMessageShouldReturnBadRequest() throws Exception {
+        when(service.createAndSendMultipartMessage(formData, mockMultipartFile)).thenReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/messages/multipart")
+                        .file(mockMultipartFile)
+                        .param("ssn", "120592640214")
+                        .param("name", "Ola Nordmann")
+                        .param("email", "norsk.email@difi.no")
+                        .param("receiver", "507369790")
+                        .param("title", "Manglende snø i Bergen")
+                        .param("content", "Det er ikke nok snø i Bergen!")
+                        .param("isSensitive", "false"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }
