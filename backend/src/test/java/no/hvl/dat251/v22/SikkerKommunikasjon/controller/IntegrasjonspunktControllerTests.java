@@ -114,7 +114,7 @@ public class IntegrasjonspunktControllerTests {
     }
 
     @Test
-    public void sendMultipartMessageShouldReturnBadRequest() throws Exception {
+    public void sendMultipartMessageServiceCallHasEmptyResponseReturnBadRequest() throws Exception {
         when(service.createAndSendMultipartMessage(formData, mockMultipartFile)).thenReturn(Optional.empty());
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/messages/multipart")
                         .file(mockMultipartFile)
