@@ -1,1 +1,1 @@
-web: npm run start 
+web: NODE_ENV=$ENV && npm run start
