@@ -95,12 +95,12 @@ public class IntegrasjonspunktService {
         identification.setType("arkivmelding");
 
         PartnerIdentification receiverIdentification = new PartnerIdentification();
-        receiverIdentification.setValue("0192:" + receiver);
         receiverIdentification.setAuthority("iso6523-actorid-upis");
+        receiverIdentification.setValue("0192:" + receiver);
 
         PartnerIdentification senderIdentification = new PartnerIdentification();
-        senderIdentification.setValue("0192:" + "991825827");
         senderIdentification.setAuthority("iso6523-actorid-upis");
+        senderIdentification.setValue("0192:" + "991825827");
 
         Partner receiverPartner = new Partner();
         Partner senderPartner = new Partner();
