@@ -55,7 +55,7 @@ public class IntegrasjonspunktServiceTests {
         Assertions.assertEquals(header.getReceiver().iterator().next().getIdentifier().getValue(), "0192:" + testReceiver);
         Assertions.assertEquals(header.getReceiver().iterator().next().getIdentifier().getAuthority(), "iso6523-actorid-upis");
 
-        Assertions.assertEquals(header.getSender().iterator().next().getIdentifier().getValue(), "0192:991825827");
+        Assertions.assertEquals(header.getSender().iterator().next().getIdentifier().getValue(), "0192:987464291");
         Assertions.assertEquals(header.getSender().iterator().next().getIdentifier().getAuthority(), "iso6523-actorid-upis");
 
         Assertions.assertEquals(header.getBusinessScope().getScope().iterator().next().getIdentifier(), "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0");
