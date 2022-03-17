@@ -40,6 +40,5 @@ public class IntegrasjonspunktService {
                 .block();
 
         return Optional.of(mapper.readTree(capabilities));
-
     }
 }

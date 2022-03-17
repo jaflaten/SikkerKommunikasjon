@@ -2,6 +2,7 @@ package no.hvl.dat251.v22.SikkerKommunikasjon.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.hvl.dat251.v22.SikkerKommunikasjon.service.MessageStatusService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,11 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class MessageStatusController {
 
-    @PostMapping("/messaging/incoming")
-    public ResponseEntity<?> messageStatus(@RequestBody String body) {
-        log.info("Endpoint '/messaging/incoming' accessed. Endpoint not implemented.");
+    private final MessageStatusService messageStatusService;
 
-        // 501 - not implemented
-        return ResponseEntity.status(501).body("Endpoint not implemented.");
+    @PostMapping("/messaging/incoming")
+    public ResponseEntity postMessageStatus(@RequestBody String body) {
+        messageStatusService.handleIncomingMessage(body);
+        return ResponseEntity.ok().build();
     }
 }
