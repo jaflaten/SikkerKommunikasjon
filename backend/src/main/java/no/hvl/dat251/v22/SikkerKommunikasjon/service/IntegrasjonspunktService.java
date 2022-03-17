@@ -116,12 +116,7 @@ public class IntegrasjonspunktService {
         return header;
     }
 
-    public URI getMultipartURI() {
-        return UriComponentsBuilder.fromUriString(properties.getIntegrasjonspunkt().getURL())
-                .path("messages/out/multipart")
-                .build()
-                .toUri();
-    }
+
 
     public URI getCapabilitiesURI(String orgnr) {
         return UriComponentsBuilder.fromUriString(properties.getIntegrasjonspunkt().getURL())
