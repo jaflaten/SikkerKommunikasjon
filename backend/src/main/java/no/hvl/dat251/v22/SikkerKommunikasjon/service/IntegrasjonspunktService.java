@@ -6,19 +6,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.difi.meldingsutveksling.domain.sbdh.*;
+import no.hvl.dat251.v22.SikkerKommunikasjon.client.IntegrasjonspunktClient;
 import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonProperties;
 import no.hvl.dat251.v22.SikkerKommunikasjon.entities.ArkivMelding;
 import no.hvl.dat251.v22.SikkerKommunikasjon.entities.FormData;
 import no.hvl.dat251.v22.SikkerKommunikasjon.utility.ArkivMeldingUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -37,6 +35,7 @@ public class IntegrasjonspunktService {
     ObjectMapper mapper = new ObjectMapper();
 
     private final SikkerKommunikasjonProperties properties;
+    private final IntegrasjonspunktClient client;
 
 
     public Optional<JsonNode> getCapabilities(String orgnr) throws JsonProcessingException {
@@ -67,16 +66,7 @@ public class IntegrasjonspunktService {
             builder.part("sbd", document);
             builder.part("form", formDataJSON);
 
-            MultiValueMap<String, HttpEntity<?>> multiPartMessageBody = builder.build();
-
-            String response = webClient.post()
-                    .uri(getMultipartURI())
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .body(BodyInserters.fromMultipartData(multiPartMessageBody))
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
+            String response = client.sendMultipartMessage(builder.build());
 
             return Optional.of(mapper.readTree(response));
         } else {
