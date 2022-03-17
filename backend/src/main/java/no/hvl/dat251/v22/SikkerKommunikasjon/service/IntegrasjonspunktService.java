@@ -100,7 +100,7 @@ public class IntegrasjonspunktService {
 
         PartnerIdentification senderIdentification = new PartnerIdentification();
         senderIdentification.setAuthority("iso6523-actorid-upis");
-        senderIdentification.setValue("0192:" + "991825827");
+        senderIdentification.setValue("0192:" + "987464291");
 
         Partner receiverPartner = new Partner();
         Partner senderPartner = new Partner();
