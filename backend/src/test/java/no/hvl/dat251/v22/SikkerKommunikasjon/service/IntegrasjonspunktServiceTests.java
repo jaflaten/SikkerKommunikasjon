@@ -38,7 +38,7 @@ public class IntegrasjonspunktServiceTests {
     @Test
     public void getArkivmeldingXMLShouldReturnArkivmelding() {
 
-        Assertions.assertEquals(service.getArkivmeldingXML().get(), arkivMelding);
+        Assertions.assertEquals(service.getArkivmeldingXML().get().getMainDocument(), arkivMelding.getMainDocument());
     }
 
     @Test

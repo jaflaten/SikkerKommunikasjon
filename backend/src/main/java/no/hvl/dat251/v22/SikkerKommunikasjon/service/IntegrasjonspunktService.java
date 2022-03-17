@@ -7,21 +7,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.difi.meldingsutveksling.domain.sbdh.*;
 import no.hvl.dat251.v22.SikkerKommunikasjon.client.IntegrasjonspunktClient;
-import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonProperties;
 import no.hvl.dat251.v22.SikkerKommunikasjon.entities.ArkivMelding;
 import no.hvl.dat251.v22.SikkerKommunikasjon.entities.FormData;
 import no.hvl.dat251.v22.SikkerKommunikasjon.utility.ArkivMeldingUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,30 +23,16 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 public class IntegrasjonspunktService {
-
-    @Qualifier("WebClient")
-    private final WebClient webClient;
     ObjectMapper mapper = new ObjectMapper();
-
-    private final SikkerKommunikasjonProperties properties;
     private final IntegrasjonspunktClient client;
 
 
-    public Optional<JsonNode> getCapabilities(String orgnr) throws JsonProcessingException {
-        String capabilities = webClient.get()
-                .uri(getCapabilitiesURI(orgnr))
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-        return Optional.of(mapper.readTree(capabilities));
-
+    public Optional<JsonNode> getCapabilities(String identifier) throws JsonProcessingException {
+        return Optional.of(mapper.readTree(client.getCapabilities(identifier)));
     }
 
     public Optional<JsonNode> createAndSendMultipartMessage(FormData formData, MultipartFile multipartFile) throws IOException {
 
-        log.info("inside service before arkivmelding");
         String formDataJSON = mapper.writeValueAsString(formData);
         StandardBusinessDocument document = new StandardBusinessDocument();
         document.setStandardBusinessDocumentHeader(createSBDHeader(formData.getReceiver()));
@@ -116,15 +96,6 @@ public class IntegrasjonspunktService {
         return header;
     }
 
-
-
-    public URI getCapabilitiesURI(String orgnr) {
-        return UriComponentsBuilder.fromUriString(properties.getIntegrasjonspunkt().getURL())
-                .path("capabilities/" + orgnr)
-                .build()
-                .toUri();
-    }
-
     public Optional<ArkivMelding> getArkivmeldingXML() {
         Optional<String> arkivmeldingString = new ArkivMeldingUtil().arkivMeldingXMLToString();
         ArkivMelding arkivMelding = new ArkivMelding();
@@ -133,7 +104,7 @@ public class IntegrasjonspunktService {
             arkivMelding.setMainDocument(arkivmeldingString.get());
             return Optional.of(arkivMelding);
         } else {
-            log.warn("ArkivMelding XML is empty, cannot create and send message!");
+            log.warn("ArkivMelding XML is empty, set main document!");
             return Optional.empty();
         }
     }
