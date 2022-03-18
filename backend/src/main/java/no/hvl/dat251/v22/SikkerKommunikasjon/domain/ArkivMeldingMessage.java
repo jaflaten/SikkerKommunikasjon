@@ -1,4 +1,4 @@
-package no.hvl.dat251.v22.SikkerKommunikasjon.entities;
+package no.hvl.dat251.v22.SikkerKommunikasjon.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @ToString
 @NoArgsConstructor
 @XmlRootElement(name = "arkivmelding", namespace = "urn:no:difi:meldingsutveksling:2.0")
-public class ArkivMelding {
+public class ArkivMeldingMessage {
 
     @XmlElement(name = "sikkerhetsnivaa")
     @JsonProperty("sikkerhetsnivaa")
@@ -21,7 +21,7 @@ public class ArkivMelding {
     @JsonProperty("hoveddokument")
     private String mainDocument;
 
-    public ArkivMelding setSecurityLevel(Integer securityLevel) {
+    public ArkivMeldingMessage setSecurityLevel(Integer securityLevel) {
         this.securityLevel = securityLevel;
         return this;
     }

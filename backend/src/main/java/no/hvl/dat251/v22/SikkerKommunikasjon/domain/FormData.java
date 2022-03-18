@@ -1,4 +1,4 @@
-package no.hvl.dat251.v22.SikkerKommunikasjon.entities;
+package no.hvl.dat251.v22.SikkerKommunikasjon.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
