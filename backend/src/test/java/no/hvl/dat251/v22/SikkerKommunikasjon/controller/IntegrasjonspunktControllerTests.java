@@ -11,6 +11,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -59,6 +60,8 @@ public class IntegrasjonspunktControllerTests {
 
     String receiver;
 
+    @Mock
+    Arkivmelding mockArkivmelding;
     Arkivmelding arkivmelding;
 
     Attachment attachment;
@@ -73,7 +76,7 @@ public class IntegrasjonspunktControllerTests {
         formData = new FormData("120592640214", "Ola Nordmann", "norsk.email@difi.no", receiver,
                 "Manglende snø i Bergen", "Det er ikke nok snø i Bergen!", false);
 
-        mockMultipartFile = new MockMultipartFile("test.pdf", "test.pdf", "application/pdf", "some content".getBytes());
+        mockMultipartFile = new MockMultipartFile("attachment", "test.pdf", "application/pdf", "some content".getBytes());
         String arkivmeldingXmlFile = new String(new ClassPathResource("arkivmelding.xml").getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
         attachment = Attachment.builder()
@@ -92,7 +95,7 @@ public class IntegrasjonspunktControllerTests {
 
         arkivmelding = Arkivmelding.builder()
                 .mainDocument(arkivmeldingXmlFile)
-                .receiver(receiver)
+                .receiver(formData.getReceiver())
                 .attachments(attachments)
                 .build();
     }
@@ -136,7 +139,7 @@ public class IntegrasjonspunktControllerTests {
 
     @Test
     public void sendMultipartMessageShouldReturn200Ok() throws Exception {
-        when(service.sendMultipartMessage(arkivmelding)).thenReturn(jsonOptional);
+        when(service.sendMultipartMessage(mockArkivmelding)).thenReturn(jsonOptional);
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/messages/multipart")
                         .file(mockMultipartFile)

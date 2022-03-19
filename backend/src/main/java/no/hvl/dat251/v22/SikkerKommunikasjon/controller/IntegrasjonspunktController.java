@@ -52,14 +52,16 @@ public class IntegrasjonspunktController {
         return capabilities.isPresent() ? ResponseEntity.ok(capabilities.get()) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping(value = "/messages/multipart", consumes = "multipart/form-data")
-    public ResponseEntity<?> sendMultipartMessage(String ssn, String name,
-                                                  String email, String receiver,
-                                                  String title, String content,
-                                                  Boolean isSensitive, @RequestParam("attachment") MultipartFile attachment) throws IOException {
+    @PostMapping(path = "/messages/multipart", consumes = "multipart/form-data")
+    public ResponseEntity<?> sendMultipartMessage(@RequestParam String ssn, @RequestParam String name,
+                                                  @RequestParam String email, @RequestParam String receiver,
+                                                  @RequestParam String title, @RequestParam String content,
+                                                  @RequestParam Boolean isSensitive, @RequestParam("attachment") MultipartFile attachment) throws IOException {
 
+        log.info("inside controller");
         FormData formData = new FormData(ssn, name, email, receiver, title, content, isSensitive);
-        Optional<JsonNode> response = service.sendMultipartMessage(createArkivmelding(formData, attachment));
+        Arkivmelding arkivmelding = createArkivmelding(formData, attachment);
+        Optional<JsonNode> response = service.sendMultipartMessage(arkivmelding);
         return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
     }
 
