@@ -2,6 +2,9 @@ import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
+  console.log(process.env)
+  console.log(process.env.REACT_APP_API_URL)
+  
   fetch("/api/v1/capabilities/991825827")
     .then((res) => res)
     .then((result) => {
