@@ -26,6 +26,7 @@ const Form = () => {
                         Personnummer
                         <input 
                             required 
+                            pattern='^(0[1-9]|[1-2][0-9]|31(?!(?:0[2469]|11))|30(?!02))(0[1-9]|1[0-2])\d{7}$'
                             type="text"  
                             name="ssn" 
                             value={formData.ssn}
@@ -62,6 +63,7 @@ const Form = () => {
                             required
                             type="text"  
                             name="receiver" 
+                            pattern='^([0-9]{4}:)?([0-9]{9})$'
                             value={formData.receiver}
                             onChange={(e) => setFormData({...formData, receiver: e.target.value})}
                         />
