@@ -17,14 +17,18 @@ class Form extends React.Component<{}, { ssn: string, name: string, email: strin
             selectedFile: null
         };
     }
-   private handleSubmit() {
-       console.log("Submit form handle")
-   }
+    private handleSubmit() {
+        console.log("Submit form handle: ");
+        var form = (document.getElementById("form") as HTMLFormElement);
+        var isFormValid = form.checkValidity();
+        console.log("Is form valid? " + isFormValid);
+        
+    }
 
     render() {
         return (
             <div>
-                <form>
+                <form id="form">
                     <div>
                         <h2>Hvem Sender Inn?</h2>
                         <label>
@@ -55,7 +59,7 @@ class Form extends React.Component<{}, { ssn: string, name: string, email: strin
                                 type="email"
                                 name="email"
                                 value={this.state.email}
-                                onChange={(e) => this.setState({email: e.target.value })}
+                                onChange={(e) => this.setState({ email: e.target.value })}
                             />
                         </label>
                     </div>
@@ -115,7 +119,7 @@ class Form extends React.Component<{}, { ssn: string, name: string, email: strin
                                 checked={!this.state.isSensitive}
                                 type="radio"
                                 name="isSensitive"
-                                onChange={(e) => this.setState({  isSensitive: !(e.target.checked) })}
+                                onChange={(e) => this.setState({ isSensitive: !(e.target.checked) })}
                             />
                         </label>
                     </div>
