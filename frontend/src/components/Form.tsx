@@ -2,11 +2,15 @@ import React from "react";
 import { useState } from "react";
 
 const Form = () => {
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString)
+
   const [formData, setFormData] = useState({
     ssn: "",
     name: "",
     email: "",
-    receiver: "",
+    receiver: urlParams.get("receiver"),
     title: "",
     message: "",
     isSensitive: false,
