@@ -1,35 +1,30 @@
 import logo from "./logo.svg";
 import "./App.css";
+import Form from './components/Form.tsx'
 
 function App() {
-  console.log(process.env)
-  console.log(process.env.REACT_APP_API_URL)
-  
-  fetch("/api/v1/capabilities/991825827")
+  console.log("Environment:");
+  console.log(process.env);
+  console.log("Test Fetching:");
+  let capabilitiesURL = process.env.REACT_APP_API_URL + "/v1/capabilities/991825827";
+  console.log(capabilitiesURL);
+
+  fetch(capabilitiesURL)
     .then((res) => res)
-    .then((result) => {
-      result.json().then((res) => console.log(res));
-    })
-    .catch(console.log);
+    .then((result) =>
+      result.json()
+    )
+    .then((res) => console.log(res))
+    .catch((e) => {
+      if(e.message === "Failed to fetch"){
+        console.log("Failed to fetch endpoint, are you sure service is running?")
+      }else {
+      console.log(e)
+      }
+    });
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1 style={{ color: "#fba161" }}>pre-demo test Sikker Kommunikasjon</h1>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Form />
   );
 }
 
