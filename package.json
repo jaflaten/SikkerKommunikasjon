@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/jaflaten/SikkerKommunikasjon/issues"
   },
-  "homepage": "https://github.com/jaflaten/SikkerKommunikasjon#readme"
+  "homepage": "https://github.com/jaflaten/SikkerKommunikasjon#readme",
+  "dependencies": {
+    "react-markdown": "^8.0.1",
+    "react-router-dom": "^6.2.2"
+  }
 }
