@@ -1,6 +1,14 @@
 import logo from "./logo.svg";
 import "./App.css";
 import Form from './components/Form.tsx'
+import Frontpage from './components/Frontpage.tsx'
+
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link
+} from "react-router-dom";
 
 function App() {
   console.log("Environment:");
@@ -16,15 +24,22 @@ function App() {
     )
     .then((res) => console.log(res))
     .catch((e) => {
-      if(e.message === "Failed to fetch"){
+      if (e.message === "Failed to fetch") {
         console.log("Failed to fetch endpoint, are you sure service is running?")
-      }else {
-      console.log(e)
+      } else {
+        console.log(e)
       }
     });
 
   return (
-    <Form />
+    <div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Frontpage />} />
+          <Route path="/form" element={<Form />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
 
