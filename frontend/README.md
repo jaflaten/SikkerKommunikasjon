@@ -7,3 +7,6 @@ replace `[port]` with port for your locally hosted backend server
 
 ### Run frontend server with
 `heroku local`
+
+### environment variables are set within the heroku app
+Settings/ConfigVars
