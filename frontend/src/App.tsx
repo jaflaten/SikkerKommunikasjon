@@ -1,5 +1,4 @@
 import logo from "./logo.svg";
-import "./App.css";
 import Form from './components/Form.tsx'
 
 function App() {
@@ -16,15 +15,15 @@ function App() {
     )
     .then((res) => console.log(res))
     .catch((e) => {
-      if(e.message === "Failed to fetch"){
+      if (e.message === "Failed to fetch") {
         console.log("Failed to fetch endpoint, are you sure service is running?")
-      }else {
-      console.log(e)
+      } else {
+        console.log(e)
       }
     });
 
   return (
-    <Form />
+      <Form />
   );
 }
 
