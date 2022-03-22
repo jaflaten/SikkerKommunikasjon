@@ -13,13 +13,12 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+@CrossOrigin(origins = {"http://localhost:5000","https://sk-prod-frontend.herokuapp.com/","https://sk-staging-frontend.herokuapp.com/"}, maxAge = 3600)
 @RequestMapping("/api/v1")
 public class IntegrasjonspunktController {
 
     private final IntegrasjonspunktService service;
-
-    @CrossOrigin
+    
     @GetMapping("/capabilities/{orgnr}")
     public ResponseEntity<?> getCapabilitiesOrgnr(@PathVariable String orgnr) {
         log.info("Looking up capabilities for organization: " + orgnr);
