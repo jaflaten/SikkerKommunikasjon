@@ -15,6 +15,7 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import javax.annotation.PostConstruct;
 import java.util.Optional;
 import java.util.Set;
 
@@ -98,6 +99,7 @@ public class IntegrasjonspunktService {
         return partner;
     }
 
+
     public DocumentIdentification newDocumentIdentification() {
         DocumentIdentification identification = new DocumentIdentification();
         identification.setStandard("urn:no:difi:arkivmelding:xsd::arkivmelding");
@@ -106,4 +108,28 @@ public class IntegrasjonspunktService {
 
         return identification;
     }
+
+    @PostConstruct
+    public void postMessageStatusSubscription() {
+        String hostName = System.getenv("HOST_NAME");
+        log.info("Host name for this environment is: " + hostName);
+
+
+        String body = "{\n" +
+                "  \"name\" : \"Incoming messages\",\n" +
+                "  \"pushEndpoint\" : \"https://sk-staging-backend.herokuapp.com/api/v1/messaging/incoming\",\n" +
+                "  \"resource\" : \"messages\",\n" +
+                "  \"event\" : \"status\",\n" +
+                "  \"filter\" : \"status=INNKOMMENDE_MOTTAT&direction=INCOMING\"\n" +
+                "}";
+
+        try {
+            String res = client.subscribe(body);
+            log.info(res);
+        } catch (RuntimeException e) {
+            log.error(e.toString());
+        }
+
+    }
+
 }

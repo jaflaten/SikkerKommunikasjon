@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -36,6 +37,23 @@ public class IntegrasjonspunktClient {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+    }
+
+    public String subscribe(String body) {
+        return webClient.post()
+                .uri(getSubscriptionUri())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(BodyInserters.fromValue(body))
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
+    private URI getSubscriptionUri() {
+        return UriComponentsBuilder.fromUriString((properties.getIntegrasjonspunkt().getURL()))
+                .path("subscriptions")
+                .build()
+                .toUri();
     }
 
     public URI getMultipartURI() {

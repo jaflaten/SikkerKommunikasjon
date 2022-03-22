@@ -1,4 +1,5 @@
-[![CodeFactor](https://www.codefactor.io/repository/github/jaflaten/sikkerkommunikasjon/badge)](https://www.codefactor.io/repository/github/jaflaten/sikkerkommunikasjon) <a href="https://zenhub.com"><img src="https://dxssrr2j0sq4w.cloudfront.net/3.2.0/img/external/zenhub-badge.png" alt="ZenHub logo"></a>
+
+[![CodeFactor](https://www.codefactor.io/repository/github/jaflaten/sikkerkommunikasjon/badge)](https://www.codefactor.io/repository/github/jaflaten/sikkerkommunikasjon)[![ZenHub](https://dxssrr2j0sq4w.cloudfront.net/3.2.0/img/external/zenhub-badge.png)](https://app.zenhub.com/workspaces/dat251-6216469675a60d001800aa7a/reports/overview) 
 
 # SikkerKommunikasjon (working title)
 Schema solution for citizen to contact companies in a secure manner using an existing transport infrastructure(eFormidling) with end-to-end encryption.
