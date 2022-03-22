@@ -1,5 +1,13 @@
 import logo from "./logo.svg";
 import Form from './components/Form.tsx'
+import Frontpage from './components/Frontpage.tsx'
+
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link
+} from "react-router-dom";
 
 function App() {
   console.log("Environment:");
@@ -23,7 +31,14 @@ function App() {
     });
 
   return (
-      <Form />
+    <div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Frontpage />} />
+          <Route path="/form" element={<Form />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
 
