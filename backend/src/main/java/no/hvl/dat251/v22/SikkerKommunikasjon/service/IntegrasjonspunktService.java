@@ -50,11 +50,13 @@ public class IntegrasjonspunktService {
     @PostConstruct
     public void postMessageStatusSubscription() throws JsonProcessingException {
 
-
         URI integrasjonspunktURI = UriComponentsBuilder.fromUriString((properties.getIntegrasjonspunkt().getURL()))
                 .path("subscriptions")
                 .build()
                 .toUri();
+
+        String hostName = System.getenv("HOST_NAME");
+        log.info("Host name for this environment is: " + hostName);
 
 
 
