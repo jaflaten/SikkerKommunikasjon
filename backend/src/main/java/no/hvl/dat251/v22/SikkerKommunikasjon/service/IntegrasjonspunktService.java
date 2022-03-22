@@ -80,15 +80,6 @@ public class IntegrasjonspunktService {
         catch (RuntimeException e) {
             log.error(e.toString());
         }
-
-
-        //return Optional.of(mapper.readTree(res));
     }
-
-
-    //public boolean subscriptionExists() {
-
-    //}
-
 
 }
