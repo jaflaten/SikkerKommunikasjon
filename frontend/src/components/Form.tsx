@@ -24,6 +24,34 @@ const Form = () => {
     selectedFile: null,
   });
 
+  const [orgLookup, setOrgLookup] = useState({
+    org: null,
+  });
+
+  const brRegURL = "https://data.brreg.no/enhetsregisteret/api/enheter/";
+
+  /**
+   * Fetches org data from brRegURL
+   * @param newOrgnr orgnazation number of org
+   * @param force optional ignore validity requirements and try fetch anyways default:false
+   */
+  const fetchOrg = async (newOrgnr, force = false) => {
+    const recElement = document.getElementById("receiver") as HTMLInputElement;
+    if (force || recElement.checkValidity()) {
+      setOrgLookup({ org: { name: "Getting Name..." } });
+      console.log("Fetching:");
+      console.log(brRegURL + newOrgnr);
+      try {
+        let responseJson = await (await fetch(brRegURL + newOrgnr)).json();
+        setOrgLookup({ org: responseJson });
+      } catch (e) {
+        console.log("Something went wrong with fetch");
+        console.log(e);
+      }
+    } else {
+      setOrgLookup({ org: null });
+    }
+  };
   const handleSubmit = () => {
     //implement handleSubmit
     let form = document.getElementById("form") as HTMLFormElement;
@@ -94,15 +122,21 @@ const Form = () => {
             <br/>
             <input
               required
+              id="receiver"
               type="text"
               name="receiver"
               pattern="^([0-9]{4}:)?([0-9]{9})$"
               value={formData.receiver}
-              onChange={(e) =>
-                setFormData({ ...formData, receiver: e.target.value })
-              }
+              onChange={(e) => {
+                setFormData({ ...formData, receiver: e.target.value });
+                fetchOrg(e.target.value);
+              }}
             />
           </label>
+          <br />
+          <a href={orgLookup.org ? orgLookup.org["hjemmeside"] : ""}>
+            {orgLookup.org ? orgLookup.org["navn"] : ""}
+          </a>
         </div>
 
         <div>
@@ -182,7 +216,7 @@ const Form = () => {
       <button
         type="button"
         onClick={() => {
-          setFormData({
+          let data = {
             ssn: "01129955131",
             name: "Ola Nordmann",
             email: "Ola.Nordmann@email.no",
@@ -191,7 +225,9 @@ const Form = () => {
             message: "au au",
             isSensitive: true,
             selectedFile: null,
-          });
+          };
+          setFormData(data);
+          fetchOrg(data.receiver, true);
         }}
       >
         Fill Mock Data
