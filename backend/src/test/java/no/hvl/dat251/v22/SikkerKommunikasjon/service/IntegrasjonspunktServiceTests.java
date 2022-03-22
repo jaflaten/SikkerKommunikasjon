@@ -1,6 +1,5 @@
 package no.hvl.dat251.v22.SikkerKommunikasjon.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.difi.meldingsutveksling.domain.sbdh.*;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.ArkivMeldingMessage;
 import org.junit.Before;
@@ -8,9 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Set;
 
@@ -23,12 +20,6 @@ public class IntegrasjonspunktServiceTests {
 
     @Autowired
     IntegrasjonspunktService service;
-
-    @MockBean
-    WebClient webClient;
-
-    @MockBean
-    ObjectMapper mapper;
 
     Partner partner;
     Partner senderPartner;
