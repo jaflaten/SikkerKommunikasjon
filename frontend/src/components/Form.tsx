@@ -22,7 +22,7 @@ const Form = () => {
     ssn: "",
     name: "",
     email: "",
-    receiver: urlParams.get("receiver"),
+    receiver: urlParams.get("receiver") || "",
     title: "",
     message: "",
     isSensitive: false,
