@@ -21,15 +21,22 @@ code {
 
 input, textarea {
   color: black;
-  background-color: #57a773;
+  background-color: #c5f3d5;
 }
 
 input:invalid,textarea:invalid {
   border: 2px solid #bd504d;
+  background-image: url(/images/invalid.png);
+  background-position: right top;
+  background-repeat: no-repeat;
+  background-color: #f3d4c5;
 }
 
 input:valid,textarea:valid {
   border: 2px solid black;
+  background-image: url(/images/valid.png);
+  background-position: right top;
+  background-repeat: no-repeat;
 }
 
 button {
