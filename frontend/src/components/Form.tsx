@@ -68,7 +68,7 @@ const Form = () => {
   };
 
   const styles = {
-    container:{"margin-left": "20px"}
+    container:{"marginLeft": "20px"}
   } as const
 
   return (
