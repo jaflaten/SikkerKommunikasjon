@@ -1,12 +1,24 @@
 import React from "react";
 import { useState } from "react";
 
+interface IFormData {
+    ssn: string;
+    name:string;
+    email:string;
+    receiver:string;
+    title:string;
+    message:string;
+    isSensitive:boolean;
+    selectedFile:File;
+}
+
 const Form = () => {
 
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString)
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString)
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IFormData>({
+
     ssn: "",
     name: "",
     email: "",
@@ -17,6 +29,34 @@ const Form = () => {
     selectedFile: null,
   });
 
+  const [orgLookup, setOrgLookup] = useState({
+    org: null,
+  });
+
+  const brRegURL = "https://data.brreg.no/enhetsregisteret/api/enheter/";
+
+  /**
+   * Fetches org data from brRegURL
+   * @param newOrgnr orgnazation number of org
+   * @param force optional ignore validity requirements and try fetch anyways default:false
+   */
+  const fetchOrg = async (newOrgnr, force = false) => {
+    const recElement = document.getElementById("receiver") as HTMLInputElement;
+    if (force || recElement.checkValidity()) {
+      setOrgLookup({ org: { name: "Getting Name..." } });
+      console.log("Fetching:");
+      console.log(brRegURL + newOrgnr);
+      try {
+        let responseJson = await (await fetch(brRegURL + newOrgnr)).json();
+        setOrgLookup({ org: responseJson });
+      } catch (e) {
+        console.log("Something went wrong with fetch");
+        console.log(e);
+      }
+    } else {
+      setOrgLookup({ org: null });
+    }
+  };
   const handleSubmit = () => {
     //implement handleSubmit
     let form = document.getElementById("form") as HTMLFormElement;
@@ -26,13 +66,19 @@ const Form = () => {
   const submit = () => {
     console.log("TODO: Handle submit form");
   };
+
+  const styles = {
+    container:{"margin-left": "20px"}
+  } as const
+
   return (
-    <div>
+    <div style={styles.container}>
       <form id="form">
         <div>
           <h2>Hvem Sender Inn?</h2>
           <label>
             Personnummer
+            <br/>
             <input
               required
               pattern="^(0[1-9]|[1-2][0-9]|31(?!(?:0[2469]|11))|30(?!02))(0[1-9]|1[0-2])\d{7}$"
@@ -44,8 +90,10 @@ const Form = () => {
               }
             />
           </label>
+          <br/>
           <label>
             Navn
+            <br/>
             <input
               required
               type="text"
@@ -56,8 +104,10 @@ const Form = () => {
               }
             />
           </label>
+          <br/>
           <label>
             Epost
+            <br/>
             <input
               required
               type="email"
@@ -74,23 +124,31 @@ const Form = () => {
           <h2>Hvem er Mottaker?</h2>
           <label>
             Mottaker
+            <br/>
             <input
               required
+              id="receiver"
               type="text"
               name="receiver"
               pattern="^([0-9]{4}:)?([0-9]{9})$"
               value={formData.receiver}
-              onChange={(e) =>
-                setFormData({ ...formData, receiver: e.target.value })
-              }
+              onChange={(e) => {
+                setFormData({ ...formData, receiver: e.target.value });
+                fetchOrg(e.target.value);
+              }}
             />
           </label>
+          <br />
+          <a href={orgLookup.org ? orgLookup.org["hjemmeside"] : ""}>
+            {orgLookup.org ? orgLookup.org["navn"] : ""}
+          </a>
         </div>
 
         <div>
           <h2>Hva skal sendes?</h2>
           <label>
             Tittel
+            <br/>
             <input
               required
               type="text"
@@ -101,8 +159,10 @@ const Form = () => {
               }
             />
           </label>
+          <br/>
           <label>
             Kommentar
+            <br/>
             <textarea
               required
               name="message"
@@ -161,7 +221,7 @@ const Form = () => {
       <button
         type="button"
         onClick={() => {
-          setFormData({
+          let data = {
             ssn: "01129955131",
             name: "Ola Nordmann",
             email: "Ola.Nordmann@email.no",
@@ -170,11 +230,15 @@ const Form = () => {
             message: "au au",
             isSensitive: true,
             selectedFile: null,
-          });
+          };
+          setFormData(data);
+          fetchOrg(data.receiver, true);
         }}
       >
         Fill Mock Data
       </button>
+        <div>
+      <img src="/logo.svg"></img></div>
     </div>
   );
 };
