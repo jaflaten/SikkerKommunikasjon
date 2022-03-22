@@ -14,8 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
@@ -79,7 +79,7 @@ public class IntegrasjonspunktService {
         return header;
     }
 
-    private BusinessScope newBusinessScope() {
+    public BusinessScope newBusinessScope() {
         Scope scope = new Scope();
         scope.setType("ConversationId");
         scope.setIdentifier("urn:no:difi:profile:arkivmelding:administrasjon:ver1.0");
