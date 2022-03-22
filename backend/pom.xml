@@ -15,23 +15,23 @@
     <description>Schema solution for citizen to contact companies in a secure manner using an existing transport
         infrastructure(eFormidling) with end-to-end encryption.
     </description>
-	<properties>
-		<java.version>11</java.version>
-		<cucumber.version>5.0.0</cucumber.version>
-		<junit-jupiter.version>5.8.2</junit-jupiter.version>
+    <properties>
+        <java.version>11</java.version>
+        <cucumber.version>5.0.0</cucumber.version>
+        <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <commons.io.version>2.11.0</commons.io.version>
-	</properties>
+    </properties>
     <dependencies>
-		<!-- project reactor -->
+        <!-- project reactor -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -44,7 +44,7 @@
             <version>2.13.0</version>
         </dependency>
 
-		<!-- spring boot -->
+        <!-- spring boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -102,7 +102,7 @@
             <version>${junit-jupiter.version}</version>
         </dependency>
 
-		<!-- cucumber -->
+        <!-- cucumber -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>

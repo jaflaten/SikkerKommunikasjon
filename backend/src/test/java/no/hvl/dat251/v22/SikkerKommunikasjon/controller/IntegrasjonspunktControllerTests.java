@@ -3,20 +3,15 @@ package no.hvl.dat251.v22.SikkerKommunikasjon.controller;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
-import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Attachment;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.FormData;
 import no.hvl.dat251.v22.SikkerKommunikasjon.service.IntegrasjonspunktService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,11 +19,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
@@ -45,7 +38,6 @@ public class IntegrasjonspunktControllerTests {
     @MockBean
     ObjectMapper objectMapper;
 
-
     private final String orgnr = "123456789";
     private final String wrongInputOrgnr = "1234567891";
     private final String notExistingOrgnr = "999888777";
@@ -60,14 +52,6 @@ public class IntegrasjonspunktControllerTests {
 
     String receiver;
 
-    @Mock
-    Arkivmelding mockArkivmelding;
-    Arkivmelding arkivmelding;
-
-    Attachment attachment;
-    Attachment form;
-
-
     @Before
     public void setup() throws IOException {
         receiver = "507369790";
@@ -77,27 +61,7 @@ public class IntegrasjonspunktControllerTests {
                 "Manglende snø i Bergen", "Det er ikke nok snø i Bergen!", false);
 
         mockMultipartFile = new MockMultipartFile("attachment", "test.pdf", "application/pdf", "some content".getBytes());
-        String arkivmeldingXmlFile = new String(new ClassPathResource("arkivmelding.xml").getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
-        attachment = Attachment.builder()
-                .filename(mockMultipartFile.getName())
-                .content(new String(mockMultipartFile.getResource().getInputStream().readAllBytes(), StandardCharsets.UTF_8))
-                .contentType(MediaType.APPLICATION_PDF)
-                .build();
-        form = Attachment.builder()
-                .content(formData.toString())
-                .contentType(MediaType.TEXT_PLAIN)
-                .filename("form")
-                .build();
-        List<Attachment> attachments = new ArrayList<>();
-        attachments.add(form);
-        attachments.add(attachment);
-
-        arkivmelding = Arkivmelding.builder()
-                .mainDocument(arkivmeldingXmlFile)
-                .receiver(formData.getReceiver())
-                .attachments(attachments)
-                .build();
     }
 
     @Test
@@ -139,7 +103,7 @@ public class IntegrasjonspunktControllerTests {
 
     @Test
     public void sendMultipartMessageShouldReturn200Ok() throws Exception {
-        when(service.sendMultipartMessage(mockArkivmelding)).thenReturn(jsonOptional);
+        when(service.sendMultipartMessage(any())).thenReturn(jsonOptional);
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/messages/multipart")
                         .file(mockMultipartFile)
@@ -155,7 +119,7 @@ public class IntegrasjonspunktControllerTests {
 
     @Test
     public void sendMultipartMessageServiceCallHasEmptyResponseReturnBadRequest() throws Exception {
-        when(service.sendMultipartMessage(arkivmelding)).thenReturn(Optional.empty());
+        when(service.sendMultipartMessage(any())).thenReturn(Optional.empty());
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/messages/multipart")
                         .file(mockMultipartFile)
                         .param("ssn", "120592640214")

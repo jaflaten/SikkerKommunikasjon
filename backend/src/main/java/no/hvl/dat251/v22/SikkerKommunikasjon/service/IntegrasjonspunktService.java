@@ -26,10 +26,10 @@ public class IntegrasjonspunktService {
     private static String TYPE_VERSION = "1.0";
     private static String HEADER_VERSION = "1.0";
 
-
     ObjectMapper mapper = new ObjectMapper();
     private final IntegrasjonspunktClient client;
     private final SikkerKommunikasjonProperties properties;
+
 
     public Optional<JsonNode> getCapabilities(String identifier) throws JsonProcessingException {
         return Optional.of(mapper.readTree(client.getCapabilities(identifier)));
@@ -49,7 +49,6 @@ public class IntegrasjonspunktService {
         JsonNode standardBusinessDocument = mapper.readTree(response);
         log.info("New message created with messageId: {}", findMessageId(standardBusinessDocument));
         return Optional.of(standardBusinessDocument);
-
     }
 
     private String findMessageId(JsonNode standardBusinessDocument) {

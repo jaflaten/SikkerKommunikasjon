@@ -58,7 +58,6 @@ public class IntegrasjonspunktController {
                                                   @RequestParam String title, @RequestParam String content,
                                                   @RequestParam Boolean isSensitive, @RequestParam("attachment") MultipartFile attachment) throws IOException {
 
-        log.info("inside controller");
         FormData formData = new FormData(ssn, name, email, receiver, title, content, isSensitive);
         Arkivmelding arkivmelding = createArkivmelding(formData, attachment);
         Optional<JsonNode> response = service.sendMultipartMessage(arkivmelding);

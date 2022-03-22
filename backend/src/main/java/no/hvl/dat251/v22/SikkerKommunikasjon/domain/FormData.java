@@ -15,6 +15,4 @@ public class FormData {
     String title;
     String content;
     Boolean isSensitive;
-
-
 }
