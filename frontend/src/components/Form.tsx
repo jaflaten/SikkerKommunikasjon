@@ -13,11 +13,16 @@ interface IFormData {
 }
 
 const Form = () => {
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString)
+
   const [formData, setFormData] = useState<IFormData>({
+
     ssn: "",
     name: "",
     email: "",
-    receiver: "",
+    receiver: urlParams.get("receiver"),
     title: "",
     message: "",
     isSensitive: false,
