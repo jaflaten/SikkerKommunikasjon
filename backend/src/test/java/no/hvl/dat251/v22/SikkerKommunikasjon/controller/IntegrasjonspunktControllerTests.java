@@ -131,9 +131,4 @@ public class IntegrasjonspunktControllerTests {
                         .param("isSensitive", "false"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
-
-    @Test
-    public void createArkivmeldingShouldCreateExpectedArkivmelding() {
-
-    }
 }
