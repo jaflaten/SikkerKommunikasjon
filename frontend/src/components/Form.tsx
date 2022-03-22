@@ -22,13 +22,19 @@ const Form = () => {
   const submit = () => {
     console.log("TODO: Handle submit form");
   };
+
+  const styles = {
+    container:{"margin-left": "20px"}
+  } as const
+
   return (
-    <div>
+    <div style={styles.container}>
       <form id="form">
         <div>
           <h2>Hvem Sender Inn?</h2>
           <label>
             Personnummer
+            <br/>
             <input
               required
               pattern="^(0[1-9]|[1-2][0-9]|31(?!(?:0[2469]|11))|30(?!02))(0[1-9]|1[0-2])\d{7}$"
@@ -40,8 +46,10 @@ const Form = () => {
               }
             />
           </label>
+          <br/>
           <label>
             Navn
+            <br/>
             <input
               required
               type="text"
@@ -52,8 +60,10 @@ const Form = () => {
               }
             />
           </label>
+          <br/>
           <label>
             Epost
+            <br/>
             <input
               required
               type="email"
@@ -70,6 +80,7 @@ const Form = () => {
           <h2>Hvem er Mottaker?</h2>
           <label>
             Mottaker
+            <br/>
             <input
               required
               type="text"
@@ -87,6 +98,7 @@ const Form = () => {
           <h2>Hva skal sendes?</h2>
           <label>
             Tittel
+            <br/>
             <input
               required
               type="text"
@@ -97,8 +109,10 @@ const Form = () => {
               }
             />
           </label>
+          <br/>
           <label>
             Kommentar
+            <br/>
             <textarea
               required
               name="message"
@@ -171,6 +185,8 @@ const Form = () => {
       >
         Fill Mock Data
       </button>
+        <div>
+      <img src="/logo.svg"></img></div>
     </div>
   );
 };

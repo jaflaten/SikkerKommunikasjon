@@ -1,5 +1,4 @@
 import logo from "./logo.svg";
-import "./App.css";
 import Form from './components/Form.tsx'
 import Frontpage from './components/Frontpage.tsx'
 
