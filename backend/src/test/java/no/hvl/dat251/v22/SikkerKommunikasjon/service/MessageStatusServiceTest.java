@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Optional;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class MessageStatusServiceTest {
@@ -32,8 +34,14 @@ public class MessageStatusServiceTest {
 
 
     @Test
-    public void messageStatusIsIncoming() throws JsonProcessingException {
-        MessageStatus result = messageStatusService.getMessageStatusFromBody(incomingJSONMessage);
-        Assert.assertEquals(Direction.INCOMING, result.getDirection());
+    public void getMessageStatusFromBodyReturnsCorrectDirection() throws JsonProcessingException {
+        Optional<MessageStatus> result = messageStatusService.getMessageStatusFromBody(incomingJSONMessage);
+        Assert.assertEquals(Direction.INCOMING, result.get().getDirection());
+    }
+
+    @Test
+    public void getMessageStatusFromBodyIsNotEmpty() throws JsonProcessingException {
+        Optional<MessageStatus> result = messageStatusService.getMessageStatusFromBody(incomingJSONMessage);
+        Assert.assertFalse(result.isEmpty());
     }
 }

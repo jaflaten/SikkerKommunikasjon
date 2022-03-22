@@ -45,7 +45,7 @@ public class MessageStatusControllerTest {
 
     @Test
     public void postMessageStatusShouldReturnStatusOk() throws Exception {
-        Mockito.doNothing().when(messageStatusService).handleIncomingMessage(incomingJSONMessage);
+        Mockito.doNothing().when(messageStatusService).handleIncomingStatusMessage(incomingJSONMessage);
 
         mockMvc.perform(
                 post("/api/v1/messaging/incoming").content(incomingJSONMessage)
