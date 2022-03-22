@@ -1,8 +1,19 @@
 import React from "react";
 import { useState } from "react";
 
+interface IFormData {
+    ssn: string;
+    name:string;
+    email:string;
+    receiver:string;
+    title:string;
+    message:string;
+    isSensitive:boolean;
+    selectedFile:File;
+}
+
 const Form = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IFormData>({
     ssn: "",
     name: "",
     email: "",
