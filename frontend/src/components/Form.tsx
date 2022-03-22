@@ -139,7 +139,7 @@ const Form = () => {
             />
           </label>
           <br />
-          <a href={orgLookup.org ? orgLookup.org["hjemmeside"] : ""}>
+          <a href={orgLookup.org ? "//"+orgLookup.org["hjemmeside"] : ""}>
             {orgLookup.org ? orgLookup.org["navn"] : ""}
           </a>
         </div>
