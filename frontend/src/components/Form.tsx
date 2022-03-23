@@ -88,7 +88,7 @@ const Form = () => {
               onChange={(e) =>
                 setFormData({ ...formData, ssn: e.target.value })
               }
-            />
+            /><div>*11 siffer</div>
           </label>
           <br/>
           <label>
@@ -103,6 +103,7 @@ const Form = () => {
                 setFormData({ ...formData, name: e.target.value })
               }
             />
+            <div>*Ditt fulle navn</div>
           </label>
           <br/>
           <label>
@@ -117,6 +118,7 @@ const Form = () => {
                 setFormData({ ...formData, email: e.target.value })
               }
             />
+            <div>*gyldig epost kreves</div>
           </label>
         </div>
 
@@ -137,6 +139,7 @@ const Form = () => {
                 fetchOrg(e.target.value);
               }}
             />
+            <div>*gyldig organisasjonsnummer (9 siffer)</div>
           </label>
           <br />
           <a href={orgLookup.org ? "//"+orgLookup.org["hjemmeside"] : ""}>
@@ -158,6 +161,7 @@ const Form = () => {
                 setFormData({ ...formData, title: e.target.value })
               }
             />
+            <div>*Tittel</div>
           </label>
           <br/>
           <label>
@@ -171,6 +175,7 @@ const Form = () => {
                 setFormData({ ...formData, message: e.target.value })
               }
             />
+            <div>*Kommentar</div>
           </label>
         </div>
 

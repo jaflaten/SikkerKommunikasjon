@@ -6,8 +6,8 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -15,25 +15,45 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+input:invalid ~ div,
+textarea:invalid ~ div {
+  visibility: visible;
+}
 
-input, textarea {
+input ~ div,
+textarea ~ div {
+  display: inline-block;
+  visibility: hidden;
+}
+
+input,
+textarea {
   color: black;
-  background-color: #57a773;
+  background-color: #c5f3d5;
 }
 
-input:invalid,textarea:invalid {
+input:invalid,
+textarea:invalid {
   border: 2px solid #bd504d;
+  background-image: url(/images/invalid.png);
+  background-position: right top;
+  background-repeat: no-repeat;
+  background-color: #f3d4c5;
 }
 
-input:valid,textarea:valid {
+input:valid,
+textarea:valid {
   border: 2px solid black;
+  background-image: url(/images/valid.png);
+  background-position: right top;
+  background-repeat: no-repeat;
 }
 
 button {
   font-size: 20px;
-  color :black;
+  color: black;
   background-color: #57a773;
 }
