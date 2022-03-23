@@ -1,6 +1,7 @@
 package no.hvl.dat251.v22.SikkerKommunikasjon.client;
 
 import lombok.RequiredArgsConstructor;
+import no.difi.meldingsutveksling.domain.sbdh.StandardBusinessDocument;
 import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
@@ -47,6 +48,24 @@ public class IntegrasjonspunktClient {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+    }
+
+
+    public String create(StandardBusinessDocument standardBusinessDocument) {
+        return webClient.post()
+                .uri(getCreateUri())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .bodyValue(standardBusinessDocument)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
+    private URI getCreateUri() {
+            return UriComponentsBuilder.fromUriString(properties.getIntegrasjonspunkt().getURL())
+                    .path("messages/out")
+                    .build()
+                    .toUri();
     }
 
     private URI getSubscriptionUri() {

@@ -24,6 +24,7 @@ import java.util.Optional;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(IntegrasjonspunktController.class)
@@ -130,5 +131,34 @@ public class IntegrasjonspunktControllerTests {
                         .param("content", "Det er ikke nok snø i Bergen!")
                         .param("isSensitive", "false"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void createMessageShouldSucceedAndReturn200OK() throws Exception {
+        mockMvc.perform(multipart("/api/v1/messages/send")
+                        .param("receiver", receiver))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+    }
+
+    @Test
+    public void uploadAttachmentToMessageShouldSucceedAndReturn200OK() throws Exception {
+        mockMvc.perform(multipart("/api/v1/messages/upload")
+                .param("messageId", "foobar")
+                        .param("ssn", "120592640214")
+                        .param("name", "Ola Nordmann")
+                        .param("email", "norsk.email@difi.no")
+                        .param("receiver", "507369790")
+                        .param("title", "Manglende snø i Bergen")
+                        .param("content", "Det er ikke nok snø i Bergen!")
+                        .param("isSensitive", "false"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void sendMessageShouldSucceedAndReturn200OK() throws Exception {
+        mockMvc.perform(multipart("/api/v1/messages/send")
+                        .param("messageId", "foobar"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }

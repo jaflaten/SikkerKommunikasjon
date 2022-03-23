@@ -132,4 +132,10 @@ public class IntegrasjonspunktService {
 
     }
 
+    public Optional<JsonNode> createMessage(String receiver) throws JsonProcessingException {
+        JsonNode jsonNode = mapper.readTree(client.create(getStandardBusinessDocument(receiver)));
+        log.info(jsonNode.size() < 0 ? "Successfully created message : " + jsonNode + "\n with messageId: " + findMessageId(jsonNode)
+                                     : "Failed to create message");
+        return Optional.of(jsonNode);
+    }
 }

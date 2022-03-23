@@ -64,6 +64,28 @@ public class IntegrasjonspunktController {
         return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
     }
 
+    @PostMapping(path = "/messages/create")
+    public ResponseEntity<?> createMessage(@RequestParam String receiver) throws JsonProcessingException {
+        //TODO implement upload the SBD to create a message.
+        Optional<JsonNode> response = service.createMessage(receiver);
+        return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
+    }
+
+    @PutMapping(path = "/messages/upload")
+    public ResponseEntity<?> uploadAttachmentToMessage(@RequestParam String messageId, @RequestParam String ssn, @RequestParam String name,
+                                                       @RequestParam String email, @RequestParam String receiver,
+                                                       @RequestParam String title, @RequestParam String content,
+                                                       @RequestParam Boolean isSensitive) {
+        //kunne vi mottatt formdata her? kan frontend lage det objektet og mate det til backend ?
+        //TODO implement
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping(path = "messages/send")
+    public ResponseEntity<?> sendMessage(@RequestParam String messageId) {
+        //TODO implement
+        return ResponseEntity.notFound().build();
+    }
 
 
     public Arkivmelding createArkivmelding(FormData form, MultipartFile attachment) throws IOException {
