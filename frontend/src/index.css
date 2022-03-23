@@ -18,6 +18,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+input:focus:invalid~ div,textarea:focus:invalid~ div{visibility:visible}
+
+input~ div, textarea~ div{
+  display:inline-block;
+  visibility:hidden;
+}
 
 input, textarea {
   color: black;
