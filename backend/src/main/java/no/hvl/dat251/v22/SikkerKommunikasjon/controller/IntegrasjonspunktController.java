@@ -66,7 +66,6 @@ public class IntegrasjonspunktController {
 
     @PostMapping(path = "/messages/create")
     public ResponseEntity<?> createMessage(@RequestParam String receiver) throws JsonProcessingException {
-        //TODO implement upload the SBD to create a message.
         Optional<JsonNode> response = service.createMessage(receiver);
         return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
     }
