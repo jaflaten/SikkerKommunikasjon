@@ -22,7 +22,7 @@ const Form = () => {
     ssn: "",
     name: "",
     email: "",
-    receiver: urlParams.get("receiver"),
+    receiver: urlParams.get("receiver") || "",
     title: "",
     message: "",
     isSensitive: false,
@@ -68,7 +68,7 @@ const Form = () => {
   };
 
   const styles = {
-    container:{"margin-left": "20px"}
+    container:{"marginLeft": "20px"}
   } as const
 
   return (
@@ -139,7 +139,7 @@ const Form = () => {
             />
           </label>
           <br />
-          <a href={orgLookup.org ? orgLookup.org["hjemmeside"] : ""}>
+          <a href={orgLookup.org ? "//"+orgLookup.org["hjemmeside"] : ""}>
             {orgLookup.org ? orgLookup.org["navn"] : ""}
           </a>
         </div>
