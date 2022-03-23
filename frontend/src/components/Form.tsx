@@ -1,5 +1,5 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import AsyncSelect from "react-select/async";
 
 interface IFormData {
   ssn: string;
@@ -13,82 +13,121 @@ interface IFormData {
 }
 
 const Form = () => {
+  const fetchOrg = async (orgNr) => {
+    try {
+      let _url = brRegURL + orgNr;
+      console.log("fetchOrg:");
+      console.log(_url);
+      let responseJson = await fetch(_url).then((res) => {
+        if (res.status === 404) {
+          return {
+            navn: "Fant ikke organisasjonsnr",
+            organisasjonsnummer: false,
+          };
+        } else if (res.status === 400) {
+          return {
+            navn: "ugyldig organisasjonsnr (9 siffer)",
+            organisasjonsnummer: false,
+          };
+        } else {
+          return res.json();
+        }
+      });
+      return responseJson;
+    } catch (e) {
+      console.log("Something went wrong with fetchOrg");
+      console.log(e);
+    }
+  };
+
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
 
-  const [searchResult, setSearchResult] = useState({
-    list: [],
-  });
+  const [selectedValue, setSelectedValue] = useState(null);
+  useEffect(() => {
+    async function getReceiver(_query) {
+      setSelectedValue(await fetchOrg(_query));
+    }
+
+    let query = urlParams.get("receiver");
+    if (query) getReceiver(query);
+  }, []);
+
+  const orgNrRegex = /^([0-9]{4}:)?([0-9]{9})$/;
+  // handle input change event
+  const handleInputChange = async (value) => {
+    if (orgNrRegex.test(value)) {
+      setSelectedValue(await fetchOrg(value));
+      blurAll();
+    }
+  };
+
+  function blurAll() {
+    var tmp = document.createElement("input");
+    document.body.appendChild(tmp);
+    tmp.focus();
+    document.body.removeChild(tmp);
+  }
+  // handle selection
+  const handleChange = (value) => {
+    setSelectedValue(value);
+  };
+
+  // load options using API call
+  const loadOptions = (inputValue) => {
+    console.log("Fetching loadoptions");
+    console.log(brRegURLSearch + inputValue);
+
+    return fetch(brRegURLSearch + inputValue)
+      .then((res) => res.json())
+      .then((jo) => {
+        let embedded = jo["_embedded"];
+        return embedded ? embedded["enheter"] : [];
+      })
+      .catch((e) => []);
+  };
 
   const [formData, setFormData] = useState<IFormData>({
     ssn: "",
     name: "",
     email: "",
-    receiver: urlParams.get("receiver") || "",
+    receiver: "",
     title: "",
     message: "",
     isSensitive: false,
     selectedFile: null,
   });
-
-  const [orgLookup, setOrgLookup] = useState({
-    org: null,
-  });
+  useEffect(() => {
+    setFormData({
+      ...formData,
+      receiver: selectedValue ? selectedValue["organisasjonsnummer"] : "",
+    });
+  }, [selectedValue]);
 
   const brRegURL = "https://data.brreg.no/enhetsregisteret/api/enheter/";
 
   const brRegURLSearch =
     "https://data.brreg.no/enhetsregisteret/api/enheter?navn=";
-  const searchOrgs = async (searchString) => {
-    if (!searchString) return;
-    fetch(brRegURLSearch + searchString)
-      .then((response) => response.json())
-      .then((result) => result["_embedded"]["enheter"])
-      .then((newList) => {
-        console.log(newList);
-        setSearchResult(newList);
-      })
-      .catch((error) => {
-        if (
-          error.message ===
-          "Cannot read properties of undefined (reading 'enheter')"
-        ) {
-          //no result
-          return;
-        }
-        console.log("error", error);
-      });
-  };
-  /**
-   * Fetches org data from brRegURL
-   * @param newOrgnr orgnazation number of org
-   * @param force optional ignore validity requirements and try fetch anyways default:false
-   */
-  const fetchOrg = async (newOrgnr, force = false) => {
-    const recElement = document.getElementById("receiver") as HTMLInputElement;
-    if (force || recElement.checkValidity()) {
-      setOrgLookup({ org: { name: "Getting Name..." } });
-      console.log("Fetching:");
-      console.log(brRegURL + newOrgnr);
-      try {
-        let responseJson = await (await fetch(brRegURL + newOrgnr)).json();
-        setOrgLookup({ org: responseJson });
-      } catch (e) {
-        console.log("Something went wrong with fetch");
-        console.log(e);
-      }
-    } else {
-      setOrgLookup({ org: null });
-    }
-  };
+
   const handleSubmit = () => {
     //implement handleSubmit
     let form = document.getElementById("form") as HTMLFormElement;
-    if (form.checkValidity() && window.confirm("Er du sikker?")) submit();
+    if (
+      form.checkValidity() &&
+      formData?.receiver &&
+      window.confirm("Er du sikker?")
+    )
+      submit();
   };
 
   const submit = () => {
     console.log("TODO: Handle submit form");
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.keyCode === 46 || e.keyCode === 8) {
+      setSelectedValue(null);
+    }
   };
 
   const styles = {
@@ -152,27 +191,21 @@ const Form = () => {
           <label>
             Mottaker
             <br />
-            <input
-              required
-              id="receiver"
-              type="text"
-              name="receiver"
-              pattern="^([0-9]{4}:)?([0-9]{9})$"
-              value={formData.receiver}
-              onChange={(e) => {
-                setFormData({ ...formData, receiver: e.target.value });
-                if (e.currentTarget.checkValidity()) {
-                  fetchOrg(e.target.value);
-                } else {
-                  searchOrgs(e.target.value);
-                }
-              }}
+            <AsyncSelect
+              cacheOptions
+              defaultOptions
+              value={selectedValue}
+              getOptionLabel={(e) => e["navn"]}
+              getOptionValue={(e) => e["organisasjonsnummer"]}
+              loadOptions={loadOptions}
+              onInputChange={handleInputChange}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
             />
-            <div>*gyldig organisasjonsnummer (9 siffer)</div>
           </label>
           <br />
-          <a href={orgLookup.org ? "//" + orgLookup.org["hjemmeside"] : ""}>
-            {orgLookup.org ? orgLookup.org["navn"] : ""}
+          <a href={selectedValue ? "//" + selectedValue["hjemmeside"] : ""}>
+            {selectedValue ? selectedValue["navn"] : ""}
           </a>
         </div>
 
@@ -254,19 +287,21 @@ const Form = () => {
 
       <button
         type="button"
-        onClick={() => {
-          let data = {
+        onClick={async () => {
+          let receiver = "987464291";
+
+          setFormData({
+            ...formData,
             ssn: "01129955131",
             name: "Ola Nordmann",
             email: "Ola.Nordmann@email.no",
-            receiver: "971524960",
             title: "Min tå er vond",
             message: "au au",
             isSensitive: true,
             selectedFile: null,
-          };
-          setFormData(data);
-          fetchOrg(data.receiver, true);
+          });
+
+          setSelectedValue(await fetchOrg(receiver));
         }}
       >
         Fill Mock Data
