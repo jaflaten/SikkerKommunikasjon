@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -135,10 +136,19 @@ public class IntegrasjonspunktControllerTests {
 
     @Test
     public void createMessageShouldSucceedAndReturn200OK() throws Exception {
+
         mockMvc.perform(multipart("/api/v1/messages/send")
                         .param("receiver", receiver))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
+    }
+
+    @Test
+    public void createMessageServiceCallHasEmptyResponseReturnBadRequest() throws Exception {
+        when(service.createMessage(any())).thenReturn(Optional.empty());
+        mockMvc.perform(multipart("/api/v1/messages/send")
+                .param("receiver", receiver))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
@@ -160,5 +170,13 @@ public class IntegrasjonspunktControllerTests {
         mockMvc.perform(multipart("/api/v1/messages/send")
                         .param("messageId", "foobar"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void sendMessageServiceCallHasEmptyResponseReturnBadRequest() throws Exception {
+        when(service.sendMessage(any())).thenReturn(ResponseEntity.badRequest().build());
+        mockMvc.perform(multipart("/api/v1/messages/send")
+                .param("messageId", "foobar"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }
