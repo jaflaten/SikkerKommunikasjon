@@ -83,8 +83,7 @@ public class IntegrasjonspunktController {
 
     @PostMapping(path = "messages/send")
     public ResponseEntity<?> sendMessage(@RequestParam String messageId) {
-        //TODO implement
-        return ResponseEntity.notFound().build();
+        return service.sendMessage(messageId);
     }
 
 

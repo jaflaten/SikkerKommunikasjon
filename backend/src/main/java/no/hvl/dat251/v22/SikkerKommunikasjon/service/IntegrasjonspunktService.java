@@ -11,6 +11,7 @@ import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonPropertie
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.ArkivMeldingMessage;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,10 @@ public class IntegrasjonspunktService {
         JsonNode standardBusinessDocument = mapper.readTree(response);
         log.info("New message created with messageId: {}", findMessageId(standardBusinessDocument));
         return Optional.of(standardBusinessDocument);
+    }
+
+    public ResponseEntity<?> sendMessage(String messageId) {
+        return client.sendMessage(messageId);
     }
 
     private String findMessageId(JsonNode standardBusinessDocument) {

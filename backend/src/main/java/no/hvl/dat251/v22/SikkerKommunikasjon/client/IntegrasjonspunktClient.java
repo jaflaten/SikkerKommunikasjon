@@ -6,6 +6,7 @@ import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonPropertie
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -28,6 +29,15 @@ public class IntegrasjonspunktClient {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .bodyValue(body)
                 .exchangeToMono(rs -> rs.bodyToMono(String.class))
+                .block();
+    }
+
+    public ResponseEntity<?> sendMessage(String messageId) {
+        return webClient.post()
+                .uri(getCreateUri() + "/" + messageId)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .retrieve()
+                .bodyToMono(ResponseEntity.class)
                 .block();
     }
 
