@@ -2,23 +2,25 @@ import React from "react";
 import { useState } from "react";
 
 interface IFormData {
-    ssn: string;
-    name:string;
-    email:string;
-    receiver:string;
-    title:string;
-    message:string;
-    isSensitive:boolean;
-    selectedFile:File;
+  ssn: string;
+  name: string;
+  email: string;
+  receiver: string;
+  title: string;
+  message: string;
+  isSensitive: boolean;
+  selectedFile: File;
 }
 
 const Form = () => {
-
   const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString)
+  const urlParams = new URLSearchParams(queryString);
+
+  const [searchResult, setSearchResult] = useState({
+    list: [],
+  });
 
   const [formData, setFormData] = useState<IFormData>({
-
     ssn: "",
     name: "",
     email: "",
@@ -35,6 +37,19 @@ const Form = () => {
 
   const brRegURL = "https://data.brreg.no/enhetsregisteret/api/enheter/";
 
+  const brRegURLSearch =
+    "https://data.brreg.no/enhetsregisteret/api/enheter?navn=";
+  const searchOrgs = async (searchString) => {
+    if (!searchString) return;
+    fetch(brRegURLSearch + searchString)
+      .then((response) => response.json())
+      .then((result) => result["_embedded"]["enheter"])
+      .then((newList) => {
+        console.log(newList);
+        setSearchResult(newList);
+      })
+      .catch((error) => console.log("error", error));
+  };
   /**
    * Fetches org data from brRegURL
    * @param newOrgnr orgnazation number of org
@@ -68,8 +83,8 @@ const Form = () => {
   };
 
   const styles = {
-    container:{"marginLeft": "20px"}
-  } as const
+    container: { marginLeft: "20px" },
+  } as const;
 
   return (
     <div style={styles.container}>
@@ -78,7 +93,7 @@ const Form = () => {
           <h2>Hvem Sender Inn?</h2>
           <label>
             Personnummer
-            <br/>
+            <br />
             <input
               required
               pattern="^(0[1-9]|[1-2][0-9]|31(?!(?:0[2469]|11))|30(?!02))(0[1-9]|1[0-2])\d{7}$"
@@ -88,12 +103,13 @@ const Form = () => {
               onChange={(e) =>
                 setFormData({ ...formData, ssn: e.target.value })
               }
-            /><div>*11 siffer</div>
+            />
+            <div>*11 siffer</div>
           </label>
-          <br/>
+          <br />
           <label>
             Navn
-            <br/>
+            <br />
             <input
               required
               type="text"
@@ -105,10 +121,10 @@ const Form = () => {
             />
             <div>*Ditt fulle navn</div>
           </label>
-          <br/>
+          <br />
           <label>
             Epost
-            <br/>
+            <br />
             <input
               required
               type="email"
@@ -126,7 +142,7 @@ const Form = () => {
           <h2>Hvem er Mottaker?</h2>
           <label>
             Mottaker
-            <br/>
+            <br />
             <input
               required
               id="receiver"
@@ -136,13 +152,17 @@ const Form = () => {
               value={formData.receiver}
               onChange={(e) => {
                 setFormData({ ...formData, receiver: e.target.value });
-                fetchOrg(e.target.value);
+                if (e.currentTarget.checkValidity()) {
+                  fetchOrg(e.target.value);
+                } else {
+                  searchOrgs(e.target.value);
+                }
               }}
             />
             <div>*gyldig organisasjonsnummer (9 siffer)</div>
           </label>
           <br />
-          <a href={orgLookup.org ? "//"+orgLookup.org["hjemmeside"] : ""}>
+          <a href={orgLookup.org ? "//" + orgLookup.org["hjemmeside"] : ""}>
             {orgLookup.org ? orgLookup.org["navn"] : ""}
           </a>
         </div>
@@ -151,7 +171,7 @@ const Form = () => {
           <h2>Hva skal sendes?</h2>
           <label>
             Tittel
-            <br/>
+            <br />
             <input
               required
               type="text"
@@ -163,10 +183,10 @@ const Form = () => {
             />
             <div>*Tittel</div>
           </label>
-          <br/>
+          <br />
           <label>
             Kommentar
-            <br/>
+            <br />
             <textarea
               required
               name="message"
@@ -242,8 +262,9 @@ const Form = () => {
       >
         Fill Mock Data
       </button>
-        <div>
-      <img src="/logo.svg"></img></div>
+      <div>
+        <img src="/logo.svg"></img>
+      </div>
     </div>
   );
 };
