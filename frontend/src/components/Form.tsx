@@ -48,7 +48,16 @@ const Form = () => {
         console.log(newList);
         setSearchResult(newList);
       })
-      .catch((error) => console.log("error", error));
+      .catch((error) => {
+        if (
+          error.message ===
+          "Cannot read properties of undefined (reading 'enheter')"
+        ) {
+          //no result
+          return;
+        }
+        console.log("error", error);
+      });
   };
   /**
    * Fetches org data from brRegURL
