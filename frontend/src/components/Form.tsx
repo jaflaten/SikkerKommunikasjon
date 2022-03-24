@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AsyncSelect from "react-select/async";
+import BrRegService from "../services/BrRegService.ts";
 
 interface IFormData {
   ssn: string;
@@ -12,81 +13,61 @@ interface IFormData {
   selectedFile: File;
 }
 
+const urlParams = new URLSearchParams(window.location.search);
+const getReceiverParam = () => urlParams.get("receiver");
+
 const Form = () => {
-  const fetchOrg = async (orgNr) => {
-    try {
-      let _url = brRegURL + orgNr;
-      console.log("fetchOrg:");
-      console.log(_url);
-      let responseJson = await fetch(_url).then((res) => {
-        if (res.status === 404) {
-          return {
-            navn: "Fant ikke organisasjonsnr",
-            organisasjonsnummer: false,
-          };
-        } else if (res.status === 400) {
-          return {
-            navn: "ugyldig organisasjonsnr (9 siffer)",
-            organisasjonsnummer: false,
-          };
-        } else {
-          return res.json();
-        }
-      });
-      return responseJson;
-    } catch (e) {
-      console.log("Something went wrong with fetchOrg");
-      console.log(e);
-    }
-  };
+  const [selectedReceiverValue, setSelectedValue] = useState(null);
 
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-
-  const [selectedValue, setSelectedValue] = useState(null);
+  /**
+   * Gets receiver param from url only on on first render
+   */
   useEffect(() => {
     async function getReceiver(_query) {
-      setSelectedValue(await fetchOrg(_query));
+      setSelectedValue(await BrRegService.getOrgByOrgNumAsync(_query));
     }
-
-    let query = urlParams.get("receiver");
+    const query = getReceiverParam();
     if (query) getReceiver(query);
   }, []);
 
+  /**
+   * Regex to check if valid organisation number Norway
+   */
   const orgNrRegex = /^([0-9]{4}:)?([0-9]{9})$/;
-  // handle input change event
-  const handleInputChange = async (value) => {
+
+  /**
+   * Handles the Receiver Searchbar InputChange
+   * @param value current value of input element
+   */
+  const handleReceiverInputChange = async (value) => {
+    //if valid orgnumber, set value, then unfocus("simulating hitting enter")
     if (orgNrRegex.test(value)) {
-      setSelectedValue(await fetchOrg(value));
+      /**
+       * unfocus all everything, scroll to bottom
+       */
+      function blurAll() {
+        var tmp = document.createElement("input");
+        document.body.appendChild(tmp);
+        tmp.focus();
+        document.body.removeChild(tmp);
+      }
+
+      setSelectedValue(await BrRegService.getOrgByOrgNumAsync(value));
       blurAll();
     }
   };
 
-  function blurAll() {
-    var tmp = document.createElement("input");
-    document.body.appendChild(tmp);
-    tmp.focus();
-    document.body.removeChild(tmp);
-  }
-  // handle selection
+  /**
+   * Handles the Receiver Searchbar selection
+   * @param value selected element
+   */
   const handleChange = (value) => {
     setSelectedValue(value);
   };
 
-  // load options using API call
-  const loadOptions = (inputValue) => {
-    console.log("Fetching loadoptions");
-    console.log(brRegURLSearch + inputValue);
-
-    return fetch(brRegURLSearch + inputValue)
-      .then((res) => res.json())
-      .then((jo) => {
-        let embedded = jo["_embedded"];
-        return embedded ? embedded["enheter"] : [];
-      })
-      .catch((e) => []);
-  };
-
+  /**
+   * Statehook for formdata, dependant on @selectedReceiverValue
+   */
   const [formData, setFormData] = useState<IFormData>({
     ssn: "",
     name: "",
@@ -97,34 +78,45 @@ const Form = () => {
     isSensitive: false,
     selectedFile: null,
   });
+  /**
+   * updates formdata receiver value on selectedReiver change
+   */
   useEffect(() => {
-    setFormData({
-      ...formData,
-      receiver: selectedValue ? selectedValue["organisasjonsnummer"] : "",
+    setFormData((prevState) => {
+      return {
+        ...prevState,
+        receiver: selectedReceiverValue
+          ? selectedReceiverValue["organisasjonsnummer"]
+          : "",
+      };
     });
-  }, [selectedValue]);
+  }, [selectedReceiverValue]);
 
-  const brRegURL = "https://data.brreg.no/enhetsregisteret/api/enheter/";
-
-  const brRegURLSearch =
-    "https://data.brreg.no/enhetsregisteret/api/enheter?navn=";
-
+  /**
+   * Handles submit button
+   */
   const handleSubmit = () => {
-    //implement handleSubmit
     let form = document.getElementById("form") as HTMLFormElement;
     if (
-      form.checkValidity() &&
-      formData?.receiver &&
-      window.confirm("Er du sikker?")
+      form.checkValidity() && //check most of form validity
+      formData?.receiver && // check receiver validity
+      window.confirm("Er du sikker?") //confirm with user
     )
       submit();
   };
 
+  /**
+   * Submit form action
+   */
   const submit = () => {
     console.log("TODO: Handle submit form");
   };
 
-  const handleKeyDown = (e) => {
+  /**
+   * Allows for ReceiverInput to be cleared if delete or backspace is hit when in focus
+   * @param e event with keycode
+   */
+  const handleKeyDownReceiver = (e) => {
     if (e.keyCode === 46 || e.keyCode === 8) {
       setSelectedValue(null);
     }
@@ -194,18 +186,24 @@ const Form = () => {
             <AsyncSelect
               cacheOptions
               defaultOptions
-              value={selectedValue}
+              value={selectedReceiverValue}
               getOptionLabel={(e) => e["navn"]}
               getOptionValue={(e) => e["organisasjonsnummer"]}
-              loadOptions={loadOptions}
-              onInputChange={handleInputChange}
+              loadOptions={BrRegService.searchByName}
+              onInputChange={handleReceiverInputChange}
               onChange={handleChange}
-              onKeyDown={handleKeyDown}
+              onKeyDown={handleKeyDownReceiver}
             />
           </label>
           <br />
-          <a href={selectedValue ? "//" + selectedValue["hjemmeside"] : ""}>
-            {selectedValue ? selectedValue["navn"] : ""}
+          <a
+            href={
+              selectedReceiverValue
+                ? "//" + selectedReceiverValue["hjemmeside"]
+                : ""
+            }
+          >
+            {selectedReceiverValue ? selectedReceiverValue["navn"] : ""}
           </a>
         </div>
 
@@ -301,13 +299,13 @@ const Form = () => {
             selectedFile: null,
           });
 
-          setSelectedValue(await fetchOrg(receiver));
+          setSelectedValue(await BrRegService.getOrgByOrgNumAsync(receiver));
         }}
       >
         Fill Mock Data
       </button>
       <div>
-        <img src="/logo.svg"></img>
+        <img src="/logo.svg" alt="Logo SK"></img>
       </div>
     </div>
   );
