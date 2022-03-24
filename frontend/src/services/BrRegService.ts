@@ -4,7 +4,7 @@ class BrRegService {
 
   static brRegURLSearchName = BrRegService.brRegURLBase + "enheter?navn=";
 
-  public static searchByName = (inputValue) => {
+  public static searchByName = (inputValue: string) => {
     return fetch(BrRegService.brRegURLSearchName + inputValue)
       .then((res) => res.json())
       .then((jo) => {
@@ -14,7 +14,7 @@ class BrRegService {
       .catch((e) => []);
   };
 
-  public static getOrgByOrgNumAsync = async (orgNr) => {
+  public static getOrgByOrgNumAsync = async (orgNr: string) => {
     try {
       let _url = BrRegService.brRegURL + orgNr;
       let responseJson = await fetch(_url).then((res) => {

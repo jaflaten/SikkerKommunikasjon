@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AsyncSelect from "react-select/async";
-import BrRegService from "../services/BrRegService.ts";
+import BrRegService from "../services/BrRegService";
 
 interface IFormData {
   ssn: string;
@@ -23,7 +23,7 @@ const Form = () => {
    * Gets receiver param from url only on on first render
    */
   useEffect(() => {
-    async function getReceiver(_query) {
+    async function getReceiver(_query: any) {
       setSelectedValue(await BrRegService.getOrgByOrgNumAsync(_query));
     }
     const query = getReceiverParam();
@@ -39,21 +39,21 @@ const Form = () => {
    * Handles the Receiver Searchbar InputChange
    * @param value current value of input element
    */
-  const handleReceiverInputChange = async (value) => {
+  const handleReceiverInputChange = async (value: string) => {
     //if valid orgnumber, set value, then unfocus("simulating hitting enter")
     if (orgNrRegex.test(value)) {
-      /**
-       * unfocus all everything, scroll to bottom
-       */
-      function blurAll() {
-        var tmp = document.createElement("input");
-        document.body.appendChild(tmp);
-        tmp.focus();
-        document.body.removeChild(tmp);
-      }
-
       setSelectedValue(await BrRegService.getOrgByOrgNumAsync(value));
       blurAll();
+    }
+
+    /**
+     * unfocus all everything, scroll to bottom
+     */
+    function blurAll() {
+      var tmp = document.createElement("input");
+      document.body.appendChild(tmp);
+      tmp.focus();
+      document.body.removeChild(tmp);
     }
   };
 
@@ -61,7 +61,7 @@ const Form = () => {
    * Handles the Receiver Searchbar selection
    * @param value selected element
    */
-  const handleChange = (value) => {
+  const handleChange = (value: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedValue(value);
   };
 
@@ -116,8 +116,8 @@ const Form = () => {
    * Allows for ReceiverInput to be cleared if delete or backspace is hit when in focus
    * @param e event with keycode
    */
-  const handleKeyDownReceiver = (e) => {
-    if (e.keyCode === 46 || e.keyCode === 8) {
+  const handleKeyDownReceiver = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === `delete` || e.key === `backspace`) {
       setSelectedValue(null);
     }
   };

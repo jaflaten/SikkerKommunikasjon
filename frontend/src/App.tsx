@@ -1,5 +1,5 @@
-import Form from "./components/Form.tsx";
-import Frontpage from "./components/Frontpage.tsx";
+import Form from "./components/Form";
+import Frontpage from "./components/Frontpage";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
