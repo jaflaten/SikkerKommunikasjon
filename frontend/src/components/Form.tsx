@@ -1,75 +1,130 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import AsyncSelect from "react-select/async";
+import BrRegService from "../services/BrRegService.ts";
 
 interface IFormData {
-    ssn: string;
-    name:string;
-    email:string;
-    receiver:string;
-    title:string;
-    message:string;
-    isSensitive:boolean;
-    selectedFile:File;
+  ssn: string;
+  name: string;
+  email: string;
+  receiver: string;
+  title: string;
+  message: string;
+  isSensitive: boolean;
+  selectedFile: File;
 }
 
+const urlParams = new URLSearchParams(window.location.search);
+const getReceiverParam = () => urlParams.get("receiver");
+
 const Form = () => {
+  const [selectedReceiverValue, setSelectedValue] = useState(null);
 
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString)
+  /**
+   * Gets receiver param from url only on on first render
+   */
+  useEffect(() => {
+    async function getReceiver(_query) {
+      setSelectedValue(await BrRegService.getOrgByOrgNumAsync(_query));
+    }
+    const query = getReceiverParam();
+    if (query) getReceiver(query);
+  }, []);
 
+  /**
+   * Regex to check if valid organisation number Norway
+   */
+  const orgNrRegex = /^([0-9]{4}:)?([0-9]{9})$/;
+
+  /**
+   * Handles the Receiver Searchbar InputChange
+   * @param value current value of input element
+   */
+  const handleReceiverInputChange = async (value) => {
+    //if valid orgnumber, set value, then unfocus("simulating hitting enter")
+    if (orgNrRegex.test(value)) {
+      /**
+       * unfocus all everything, scroll to bottom
+       */
+      function blurAll() {
+        var tmp = document.createElement("input");
+        document.body.appendChild(tmp);
+        tmp.focus();
+        document.body.removeChild(tmp);
+      }
+
+      setSelectedValue(await BrRegService.getOrgByOrgNumAsync(value));
+      blurAll();
+    }
+  };
+
+  /**
+   * Handles the Receiver Searchbar selection
+   * @param value selected element
+   */
+  const handleChange = (value) => {
+    setSelectedValue(value);
+  };
+
+  /**
+   * Statehook for formdata, dependant on @selectedReceiverValue
+   */
   const [formData, setFormData] = useState<IFormData>({
-
     ssn: "",
     name: "",
     email: "",
-    receiver: urlParams.get("receiver") || "",
+    receiver: "",
     title: "",
     message: "",
     isSensitive: false,
     selectedFile: null,
   });
-
-  const [orgLookup, setOrgLookup] = useState({
-    org: null,
-  });
-
-  const brRegURL = "https://data.brreg.no/enhetsregisteret/api/enheter/";
+  /**
+   * updates formdata receiver value on selectedReiver change
+   */
+  useEffect(() => {
+    setFormData((prevState) => {
+      return {
+        ...prevState,
+        receiver: selectedReceiverValue
+          ? selectedReceiverValue["organisasjonsnummer"]
+          : "",
+      };
+    });
+  }, [selectedReceiverValue]);
 
   /**
-   * Fetches org data from brRegURL
-   * @param newOrgnr orgnazation number of org
-   * @param force optional ignore validity requirements and try fetch anyways default:false
+   * Handles submit button
    */
-  const fetchOrg = async (newOrgnr, force = false) => {
-    const recElement = document.getElementById("receiver") as HTMLInputElement;
-    if (force || recElement.checkValidity()) {
-      setOrgLookup({ org: { name: "Getting Name..." } });
-      console.log("Fetching:");
-      console.log(brRegURL + newOrgnr);
-      try {
-        let responseJson = await (await fetch(brRegURL + newOrgnr)).json();
-        setOrgLookup({ org: responseJson });
-      } catch (e) {
-        console.log("Something went wrong with fetch");
-        console.log(e);
-      }
-    } else {
-      setOrgLookup({ org: null });
-    }
-  };
   const handleSubmit = () => {
-    //implement handleSubmit
     let form = document.getElementById("form") as HTMLFormElement;
-    if (form.checkValidity() && window.confirm("Er du sikker?")) submit();
+    if (
+      form.checkValidity() && //check most of form validity
+      formData?.receiver && // check receiver validity
+      window.confirm("Er du sikker?") //confirm with user
+    )
+      submit();
   };
 
+  /**
+   * Submit form action
+   */
   const submit = () => {
     console.log("TODO: Handle submit form");
   };
 
+  /**
+   * Allows for ReceiverInput to be cleared if delete or backspace is hit when in focus
+   * @param e event with keycode
+   */
+  const handleKeyDownReceiver = (e) => {
+    if (e.keyCode === 46 || e.keyCode === 8) {
+      setSelectedValue(null);
+    }
+  };
+
   const styles = {
-    container:{"marginLeft": "20px"}
-  } as const
+    container: { marginLeft: "20px" },
+  } as const;
 
   return (
     <div style={styles.container}>
@@ -78,7 +133,7 @@ const Form = () => {
           <h2>Hvem Sender Inn?</h2>
           <label>
             Personnummer
-            <br/>
+            <br />
             <input
               required
               pattern="^(0[1-9]|[1-2][0-9]|31(?!(?:0[2469]|11))|30(?!02))(0[1-9]|1[0-2])\d{7}$"
@@ -88,12 +143,13 @@ const Form = () => {
               onChange={(e) =>
                 setFormData({ ...formData, ssn: e.target.value })
               }
-            /><div>*11 siffer</div>
+            />
+            <div>*11 siffer</div>
           </label>
-          <br/>
+          <br />
           <label>
             Navn
-            <br/>
+            <br />
             <input
               required
               type="text"
@@ -105,10 +161,10 @@ const Form = () => {
             />
             <div>*Ditt fulle navn</div>
           </label>
-          <br/>
+          <br />
           <label>
             Epost
-            <br/>
+            <br />
             <input
               required
               type="email"
@@ -126,24 +182,28 @@ const Form = () => {
           <h2>Hvem er Mottaker?</h2>
           <label>
             Mottaker
-            <br/>
-            <input
-              required
-              id="receiver"
-              type="text"
-              name="receiver"
-              pattern="^([0-9]{4}:)?([0-9]{9})$"
-              value={formData.receiver}
-              onChange={(e) => {
-                setFormData({ ...formData, receiver: e.target.value });
-                fetchOrg(e.target.value);
-              }}
+            <br />
+            <AsyncSelect
+              cacheOptions
+              defaultOptions
+              value={selectedReceiverValue}
+              getOptionLabel={(e) => e["navn"]}
+              getOptionValue={(e) => e["organisasjonsnummer"]}
+              loadOptions={BrRegService.searchByName}
+              onInputChange={handleReceiverInputChange}
+              onChange={handleChange}
+              onKeyDown={handleKeyDownReceiver}
             />
-            <div>*gyldig organisasjonsnummer (9 siffer)</div>
           </label>
           <br />
-          <a href={orgLookup.org ? "//"+orgLookup.org["hjemmeside"] : ""}>
-            {orgLookup.org ? orgLookup.org["navn"] : ""}
+          <a
+            href={
+              selectedReceiverValue
+                ? "//" + selectedReceiverValue["hjemmeside"]
+                : ""
+            }
+          >
+            {selectedReceiverValue ? selectedReceiverValue["navn"] : ""}
           </a>
         </div>
 
@@ -151,7 +211,7 @@ const Form = () => {
           <h2>Hva skal sendes?</h2>
           <label>
             Tittel
-            <br/>
+            <br />
             <input
               required
               type="text"
@@ -163,10 +223,10 @@ const Form = () => {
             />
             <div>*Tittel</div>
           </label>
-          <br/>
+          <br />
           <label>
             Kommentar
-            <br/>
+            <br />
             <textarea
               required
               name="message"
@@ -225,25 +285,28 @@ const Form = () => {
 
       <button
         type="button"
-        onClick={() => {
-          let data = {
+        onClick={async () => {
+          let receiver = "987464291";
+
+          setFormData({
+            ...formData,
             ssn: "01129955131",
             name: "Ola Nordmann",
             email: "Ola.Nordmann@email.no",
-            receiver: "971524960",
             title: "Min tå er vond",
             message: "au au",
             isSensitive: true,
             selectedFile: null,
-          };
-          setFormData(data);
-          fetchOrg(data.receiver, true);
+          });
+
+          setSelectedValue(await BrRegService.getOrgByOrgNumAsync(receiver));
         }}
       >
         Fill Mock Data
       </button>
-        <div>
-      <img src="/logo.svg"></img></div>
+      <div>
+        <img src="/logo.svg" alt="Logo SK"></img>
+      </div>
     </div>
   );
 };
