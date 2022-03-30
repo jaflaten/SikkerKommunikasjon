@@ -109,6 +109,16 @@ const Form = () => {
    * Submit form action
    */
   const submit = () => {
+    const requestOptions = {
+      method: 'POST',
+      headers: {"Content-type": "multipart/form-data"},
+      body: JSON.stringify(formData)
+    };
+    
+    fetch("http://localhost:1337/api/v1/messages/multipart", requestOptions)
+      .then(response => response.text())
+      .then(result => console.log(result))
+      .catch(error => console.log('error', error));
     console.log("TODO: Handle submit form");
   };
 
