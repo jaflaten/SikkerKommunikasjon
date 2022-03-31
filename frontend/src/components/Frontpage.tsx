@@ -1,7 +1,6 @@
-import React from "react";
 import ReactMarkdown from "react-markdown";
 import { useState, useEffect } from "react";
-
+import gfm from "remark-gfm";
 const Frontpage = () => {
   const [md, setMd] = useState("");
 
@@ -15,10 +14,19 @@ const Frontpage = () => {
 
   return (
     <div>
-      <ReactMarkdown>{md}</ReactMarkdown>
-      <button type="button" onClick={() => window.location.assign("/form")}>
-        Send et skjema
-      </button>
+      <div className="fpDescription">
+        <ReactMarkdown remarkPlugins={[gfm]}>{md}</ReactMarkdown>
+      </div>
+      <div className="fpButton">
+        <button
+          id="toFormButton"
+          type="button"
+          onClick={() => window.location.assign("/form")}
+        >
+          Send ett
+          <br /> skjema
+        </button>
+      </div>
     </div>
   );
 };

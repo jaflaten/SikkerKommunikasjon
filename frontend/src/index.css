@@ -57,3 +57,22 @@ button {
   color: black;
   background-color: #57a773;
 }
+
+.fpDescription {
+  float: left;
+  width: 50%;
+  border: solid #706f6f;
+}
+
+.fpButton {
+  float: right;
+  padding: 10px;
+}
+
+img {
+  max-width: 100%;
+}
+
+#toFormButton {
+  font-size: 40px;
+}
