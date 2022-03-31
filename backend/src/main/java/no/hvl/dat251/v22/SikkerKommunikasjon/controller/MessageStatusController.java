@@ -18,8 +18,8 @@ public class MessageStatusController {
     private final MessageStatusService messageStatusService;
 
     @PostMapping("/messaging/incoming")
-    public ResponseEntity postMessageStatus(@RequestBody String body) {
-        messageStatusService.handleIncomingMessage(body);
+    public ResponseEntity<?> postMessageStatus(@RequestBody String body) {
+        messageStatusService.handleIncomingStatusMessage(body);
         return ResponseEntity.ok().build();
     }
 }

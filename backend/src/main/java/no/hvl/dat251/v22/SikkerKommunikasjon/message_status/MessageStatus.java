@@ -1,12 +1,29 @@
 package no.hvl.dat251.v22.SikkerKommunikasjon.message_status;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MessageStatus {
 
-    private Status status;
-    private Direction direction;
+    private final Status status;
+    private final Direction direction;
+
+    private final static ObjectMapper objectMapper = new ObjectMapper();
+
+    public static MessageStatus fromJSON(String body) {
+        try {
+            JsonNode node = objectMapper.readTree(body);
+
+            Status status = Status.valueOf(node.get("status").asText());
+            Direction direction = Direction.valueOf(node.get("direction").asText());
+
+            return new MessageStatus(status, direction);
+        } catch (Exception e) {
+            return new MessageStatus(Status.FEIL, Direction.NONE);
+        }
+    }
 }
