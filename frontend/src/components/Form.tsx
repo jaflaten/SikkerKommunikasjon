@@ -110,16 +110,17 @@ const Form = () => {
    */
   const submit = () => {
     const requestOptions = {
-      method: 'POST',
-      headers: {"Content-type": "multipart/form-data"},
-      body: JSON.stringify(formData)
+      method: "POST",
+      body: new FormData(document.getElementById("form") as HTMLFormElement),
     };
-    
-    fetch("http://localhost:1337/api/v1/messages/multipart", requestOptions)
-      .then(response => response.text())
-      .then(result => console.log(result))
-      .catch(error => console.log('error', error));
-    console.log("TODO: Handle submit form");
+    const _url = process.env.REACT_APP_API_URL + "/v1/messages/multipart";
+    console.log("Trying to post: ");
+    console.log(_url);
+
+    fetch(_url, requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.log("error", error));
   };
 
   /**
@@ -194,6 +195,7 @@ const Form = () => {
             Mottaker
             <br />
             <AsyncSelect
+              name="receiver"
               cacheOptions
               defaultOptions
               value={selectedReceiverValue}
@@ -239,7 +241,7 @@ const Form = () => {
             <br />
             <textarea
               required
-              name="message"
+              name="content"
               value={formData.message}
               onChange={(e) =>
                 setFormData({ ...formData, message: e.target.value })
@@ -281,6 +283,7 @@ const Form = () => {
           <label>
             <input
               type="file"
+              name="attachment"
               onChange={(e) =>
                 setFormData({ ...formData, selectedFile: e.target.files[0] })
               } //only accepts 1 fileupload
