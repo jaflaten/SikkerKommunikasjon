@@ -135,7 +135,7 @@ const Form = () => {
    * @param e event with keycode
    */
   const handleKeyDownReceiver = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === `delete` || e.key === `backspace`) {
+    if (e.key === `Delete` || e.key === `Backspace`) {
       setSelectedValue(null);
     }
   };
