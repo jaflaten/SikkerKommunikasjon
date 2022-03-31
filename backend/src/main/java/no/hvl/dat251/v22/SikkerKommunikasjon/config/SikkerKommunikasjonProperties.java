@@ -21,6 +21,9 @@ public class SikkerKommunikasjonProperties {
     public static class Integrasjonspunkt {
         @NotNull
         private String URL;
+
+        @NotNull
+        private String sender;
     }
 
 }
