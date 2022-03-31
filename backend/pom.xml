@@ -15,22 +15,23 @@
     <description>Schema solution for citizen to contact companies in a secure manner using an existing transport
         infrastructure(eFormidling) with end-to-end encryption.
     </description>
-	<properties>
-		<java.version>11</java.version>
-		<cucumber.version>5.0.0</cucumber.version>
-		<junit-jupiter.version>5.8.2</junit-jupiter.version>
-	</properties>
+    <properties>
+        <java.version>11</java.version>
+        <cucumber.version>5.0.0</cucumber.version>
+        <junit-jupiter.version>5.8.2</junit-jupiter.version>
+        <commons.io.version>2.11.0</commons.io.version>
+    </properties>
     <dependencies>
-		<!-- project reactor -->
+        <!-- project reactor -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -43,7 +44,7 @@
             <version>2.13.0</version>
         </dependency>
 
-		<!-- spring boot -->
+        <!-- spring boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -62,13 +63,25 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>5.3.16</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <!--<scope>provided</scope>-->
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+
 
         <!-- Junit -->
         <dependency>
@@ -89,7 +102,7 @@
             <version>${junit-jupiter.version}</version>
         </dependency>
 
-		<!-- cucumber -->
+        <!-- cucumber -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>

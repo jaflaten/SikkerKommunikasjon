@@ -1,9 +1,11 @@
+# SikkerKommunikasjon- Fra bruker til virksomhet ✉️
 
-[![CodeFactor](https://www.codefactor.io/repository/github/jaflaten/sikkerkommunikasjon/badge)](https://www.codefactor.io/repository/github/jaflaten/sikkerkommunikasjon)[![ZenHub](https://dxssrr2j0sq4w.cloudfront.net/3.2.0/img/external/zenhub-badge.png)](https://app.zenhub.com/workspaces/dat251-6216469675a60d001800aa7a/reports/overview) 
+## Med denne tenesta kan både privatpersonar og verksemder sende dokument til virksomheter via ein sikker og effektiv kanal
+- [ ] Tenesta krev sikker identifisering som tildømes bankID
+- [x] Data blir overført kryptert
+- [ ] Det gir ein sikker identifikasjon av avsendar
 
-# SikkerKommunikasjon (working title)
-Schema solution for citizen to contact companies in a secure manner using an existing transport infrastructure(eFormidling) with end-to-end encryption.
 
-This is a student project at Høgskulen på Vestlandet in spring 2022. The course is DAT251 Modern Software Development Methods
 
-Don't Mind me
+## Partners
+[![DigDir](https://www.digdir.no/profiles/sogn/themes/sogn_theme/img/logo/logo_sogn.svg?r9m286)](https://www.digdir.no/)[![HVL](https://media.snl.no/media/151679/standard_hvl.png)](https://www.hvl.no)
