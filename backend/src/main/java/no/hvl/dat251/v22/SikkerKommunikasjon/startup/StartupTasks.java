@@ -52,12 +52,12 @@ public class StartupTasks {
 
         String body =
                 "{\n" +
-                "  \"name\" : \"Incoming messages\",\n" +
-                "  \"pushEndpoint\" : "+hostName+"/api/v1/messaging/incoming\",\n" +
-                "  \"resource\" : \"messages\",\n" +
-                "  \"event\" : \"status\",\n" +
-                "  \"filter\" : \"direction=INCOMING\"\n" +
-                "}";
+                        "  \"name\" : \"Incoming messages\",\n" +
+                        "  \"pushEndpoint\" : " + hostName + "/api/v1/messaging/incoming\",\n" +
+                        "  \"resource\" : \"messages\",\n" +
+                        "  \"event\" : \"status\",\n" +
+                        "  \"filter\" : \"direction=INCOMING\"\n" +
+                        "}";
 
         try {
             String res = webClient.post()
@@ -68,12 +68,13 @@ public class StartupTasks {
                     .bodyToMono(String.class)
                     .block();
 
-            log.info("Connected to "+getIntegrasjonspunktURI("subscriptions") + " [POST]");
-            log.info("Successfully subscribed to Integrasjonspunktet, response:\n"+res);
-        }
-        catch (WebClientResponseException e) {
+            log.info("Connected to " + getIntegrasjonspunktURI("subscriptions") + " [POST]");
+            log.info("Successfully subscribed to Integrasjonspunktet, response:\n" + res);
+        } catch (WebClientResponseException e) {
             if (e.getStatusCode().is4xxClientError())
-                log.warn("Error while trying to subscribe to message statuses (maybe already subscribed?): "+e.getStatusText());
+                log.warn("Error while trying to subscribe to message statuses (maybe already subscribed?): " + e.getStatusText());
+        } catch (Exception e) {
+            log.error("Error while trying to subscribe to message statuses.");
         }
     }
 
@@ -86,10 +87,11 @@ public class StartupTasks {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-            log.info("Active message status subscriptions:\n"+res);
-        }
-        catch (WebClientResponseException e) {
+            log.info("Active message status subscriptions:\n" + res);
+        } catch (WebClientResponseException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            log.error("Error while trying to subscribe to message statuses.");
         }
     }
 }
