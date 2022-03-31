@@ -119,8 +119,15 @@ const Form = () => {
 
     fetch(_url, requestOptions)
       .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.log("error", error));
+      .then((result) => {
+        console.log(result);
+        alert("Melding har blitt sendt, du blir sendt til fremsiden");
+        window.location.assign("/");
+      })
+      .catch((error) => {
+        console.log("error", error);
+        alert("Noe gikk feil, prøv igjen?");
+      });
   };
 
   /**
