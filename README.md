@@ -1,10 +1,10 @@
 # SikkerKommunikasjon- Fra bruker til virksomhet ✉️
 
-## Med tenesta eDialog kan både privatpersonar og verksemder sende dokument til Virksomheter via ein sikker og effektiv kanal
-* Tenesta krev sikker identifisering som tildømes bankID
-* Data blir overført kryptert
-* Det gir ein sikker identifikasjon av avsendar
-* Dokument blir sende elektronisk og mottekne direkte i vårt system
+## Med denne tenesta kan både privatpersonar og verksemder sende dokument til virksomheter via ein sikker og effektiv kanal
+- [ ] Tenesta krev sikker identifisering som tildømes bankID
+- [x] Data blir overført kryptert
+- [ ] Det gir ein sikker identifikasjon av avsendar
+
 
 
 ## Partners
