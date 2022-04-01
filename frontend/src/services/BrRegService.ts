@@ -75,47 +75,36 @@ class BrRegService {
   private static getOrgByOrgNumAsync = async (orgNr: string) => {
     try {
       let _url = BrRegService.brRegURL + orgNr;
-      let responseJson = await fetch(_url).then((res) => {
-        if (res.status === 404) {
-          return {
-            navn: "Fant ikke organisasjonsnr",
-            organisasjonsnummer: false,
-          };
-        } else if (res.status === 400) {
-          return {
-            navn: "ugyldig organisasjonsnr (9 siffer)",
-            organisasjonsnummer: false,
-          };
-        } else {
-          return res.json();
-        }
-      });
-      return responseJson;
+      return BrRegService.fetchSingleOrgFromUrl(_url);
     } catch (e) {
       console.log("Something went wrong with getOrgByOrgNumAsync");
       console.log(e);
     }
   };
 
+  private static fetchSingleOrgFromUrl = async (_url: string) => {
+    let responseJson = await fetch(_url).then((res) => {
+      if (res.status === 404) {
+        return {
+          navn: "Fant ikke organisasjonsnr",
+          organisasjonsnummer: false,
+        };
+      } else if (res.status === 400) {
+        return {
+          navn: "ugyldig organisasjonsnr (9 siffer)",
+          organisasjonsnummer: false,
+        };
+      } else {
+        return res.json();
+      }
+    });
+    return responseJson;
+  };
+
   private static getOrgSubEntityAsync = async (orgNr: string) => {
     try {
       let _url = BrRegService.brRegSubURL + orgNr;
-      let responseJson = await fetch(_url).then((res) => {
-        if (res.status === 404) {
-          return {
-            navn: "Fant ikke organisasjonsnr",
-            organisasjonsnummer: false,
-          };
-        } else if (res.status === 400) {
-          return {
-            navn: "ugyldig organisasjonsnr (9 siffer)",
-            organisasjonsnummer: false,
-          };
-        } else {
-          return res.json();
-        }
-      });
-      return responseJson;
+      return BrRegService.fetchSingleOrgFromUrl(_url);
     } catch (e) {
       console.log("Something went wrong with getOrgSubEntityAsync");
       console.log(e);
