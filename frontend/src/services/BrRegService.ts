@@ -75,7 +75,9 @@ class BrRegService {
   private static getOrgByOrgNumAsync = async (orgNr: string) => {
     try {
       let _url = BrRegService.brRegURL + orgNr;
-      return BrRegService.fetchSingleOrgFromUrl(_url);
+      return BrRegService.fetchSingleOrgFromUrl(_url).catch((e) => {
+        throw e;
+      });
     } catch (e) {
       console.log("Something went wrong with getOrgByOrgNumAsync");
       console.log(e);
@@ -104,7 +106,9 @@ class BrRegService {
   private static getOrgSubEntityAsync = async (orgNr: string) => {
     try {
       let _url = BrRegService.brRegSubURL + orgNr;
-      return BrRegService.fetchSingleOrgFromUrl(_url);
+      return BrRegService.fetchSingleOrgFromUrl(_url).catch((e) => {
+        throw e;
+      });
     } catch (e) {
       console.log("Something went wrong with getOrgSubEntityAsync");
       console.log(e);
