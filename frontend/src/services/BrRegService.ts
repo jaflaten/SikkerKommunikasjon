@@ -73,15 +73,11 @@ class BrRegService {
   };
 
   private static getOrgByOrgNumAsync = async (orgNr: string) => {
-    try {
-      let _url = BrRegService.brRegURL + orgNr;
-      return BrRegService.fetchSingleOrgFromUrl(_url).catch((e) => {
-        throw e;
-      });
-    } catch (e) {
+    let _url = BrRegService.brRegURL + orgNr;
+    return BrRegService.fetchSingleOrgFromUrl(_url).catch((e) => {
       console.log("Something went wrong with getOrgByOrgNumAsync");
       console.log(e);
-    }
+    });
   };
 
   private static fetchSingleOrgFromUrl = async (_url: string) => {
@@ -104,15 +100,11 @@ class BrRegService {
   };
 
   private static getOrgSubEntityAsync = async (orgNr: string) => {
-    try {
-      let _url = BrRegService.brRegSubURL + orgNr;
-      return BrRegService.fetchSingleOrgFromUrl(_url).catch((e) => {
-        throw e;
-      });
-    } catch (e) {
-      console.log("Something went wrong with getOrgSubEntityAsync");
+    let _url = BrRegService.brRegSubURL + orgNr;
+    return BrRegService.fetchSingleOrgFromUrl(_url).catch((e) => {
+      console.log("Something went wrong with getOrgByOrgNumAsync");
       console.log(e);
-    }
+    });
   };
 }
 export default BrRegService;
