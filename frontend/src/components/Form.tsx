@@ -24,7 +24,7 @@ const Form = () => {
    */
   useEffect(() => {
     async function getReceiver(_query: any) {
-      setSelectedValue(await BrRegService.getOrgByOrgNumAsync(_query));
+      setSelectedValue(await BrRegService.getAnyOrgEntityByNumAsync(_query));
     }
     const query = getReceiverParam();
     if (query) getReceiver(query);
@@ -42,7 +42,7 @@ const Form = () => {
   const handleReceiverInputChange = async (value: string) => {
     //if valid orgnumber, set value, then unfocus("simulating hitting enter")
     if (orgNrRegex.test(value)) {
-      setSelectedValue(await BrRegService.getOrgByOrgNumAsync(value));
+      setSelectedValue(await BrRegService.getAnyOrgEntityByNumAsync(value));
       blurAll();
     }
 
@@ -208,7 +208,7 @@ const Form = () => {
               value={selectedReceiverValue}
               getOptionLabel={(e) => e["navn"]}
               getOptionValue={(e) => e["organisasjonsnummer"]}
-              loadOptions={BrRegService.searchByName}
+              loadOptions={BrRegService.searchAnyByNameAsync}
               onInputChange={handleReceiverInputChange}
               onChange={handleChange}
               onKeyDown={handleKeyDownReceiver}
@@ -319,7 +319,9 @@ const Form = () => {
             selectedFile: null,
           });
 
-          setSelectedValue(await BrRegService.getOrgByOrgNumAsync(receiver));
+          setSelectedValue(
+            await BrRegService.getAnyOrgEntityByNumAsync(receiver)
+          );
         }}
       >
         Fill Mock Data
