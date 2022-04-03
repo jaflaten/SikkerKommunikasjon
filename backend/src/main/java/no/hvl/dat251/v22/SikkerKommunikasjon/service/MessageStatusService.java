@@ -26,7 +26,7 @@ public class MessageStatusService {
         log.info("Received body from integrasjonspunktet with status: " + messageStatus);
 
         // notify associated user about the updated status
-        String dummyEmail = "yavor45031@sartess.com";
+        String dummyEmail = "yavor45031@sartess.com";  // Generated from https://temp-mail.org/en/
         emailService.sendSimpleEmail(
                 dummyEmail,
                 "Updated Status",

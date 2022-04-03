@@ -17,18 +17,38 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    // The email sikkerkommunikasjon sends it's emails from
+    /**
+     * The email sikkerkommunikasjon sends it's emails from
+     */
     public static final String SIKKERKOMMUNIKASJON_EMAIL = "sikkerkomm_test@protonmail.com";
+
+    /**
+     * If the email service is operational, e.g. correct api-keys are set
+     */
+    private boolean isEnabled;
 
     private MailjetClient client;
 
     @Autowired
     public EmailService() {
-        client = new MailjetClient(
-                System.getenv("apiKey"),
-                System.getenv("apiSecret"),
-                new ClientOptions("v3.1")
-        );
+        String apiKeyPublic = System.getenv("MJ_APIKEY_PUBLIC");
+        String apiKeyPrivate = System.getenv("MJ_APIKEY_PRIVATE");
+
+        isEnabled = false;
+        if (apiKeyPublic != null && apiKeyPrivate != null)
+            isEnabled = true;  // Found both environment variables
+        if (apiKeyPublic == null)
+            log.error("Could not find environment variable 'MJ_APIKEY_PUBLIC' used for email service.");
+        if (apiKeyPrivate == null)
+            log.error("Could not find environment variable 'MJ_APIKEY_PRIVATE' used for email service.");
+
+        if (isEnabled) {
+            client = new MailjetClient(
+                    apiKeyPublic,
+                    apiKeyPrivate,
+                    new ClientOptions("v3.1")
+            );
+        }
     }
 
     /**
@@ -39,6 +59,10 @@ public class EmailService {
      * @param message   The message that the email should contain
      */
     public void sendSimpleEmail(String recipient, String subject, String message) {
+        if (!isEnabled) {
+            log.error("Email capabilities is disabled, not sending email with subject: '" + subject + "'.");
+        }
+
         MailjetRequest request = new MailjetRequest(Emailv31.resource)
                 .property(Emailv31.MESSAGES, new JSONArray()
                         .put(new JSONObject()
