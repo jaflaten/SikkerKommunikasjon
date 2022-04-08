@@ -16,7 +16,6 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
@@ -58,8 +57,8 @@ public class IntegrasjonspunktService {
         return client.sendMessage(messageId);
     }
 
-    public ResponseEntity<?> uploadAttachment(String messageId, String fileName, String title, File file) throws IOException {
-        return client.upload(messageId, fileName, title, file);
+    public ResponseEntity<?> uploadAttachment(String messageId, String contentType, String contentDisposition)  {
+        return client.upload(messageId, contentType, contentDisposition);
     }
 
     private String findMessageId(JsonNode standardBusinessDocument) {

@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.difi.meldingsutveksling.domain.sbdh.StandardBusinessDocument;
 import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +14,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
 
 @Component
 @Slf4j
@@ -77,20 +73,15 @@ public class IntegrasjonspunktClient {
                 .block();
     }
 
-    public ResponseEntity<?> upload(String messageId, String fileName, String title, File file) throws IOException {
-        ContentDisposition contentDisposition = ContentDisposition.attachment()
-                .filename(fileName)
-                .name(title)
-                .build();
-
-        //MediaType.asMediaType(MimeType.valueOf("text/plain;UTF-8"));
-        MediaType contentType = MediaType.valueOf(Files.probeContentType(file.getAbsoluteFile().toPath()));
+    public ResponseEntity<?> upload(String messageId, String contentTypeString, String contentDispositionString) {
+        MediaType contentType = MediaType.parseMediaType(contentTypeString);
+        log.info("contentdisp is : " + contentDispositionString);
         log.info("Content type is: " + contentType);
+
         return webClient.put()
                 .uri(getUploadUri(messageId))
-                .header(contentDisposition.toString())
                 .contentType(contentType)
-                .body(BodyInserters.fromValue(file))
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDispositionString)
                 .retrieve()
                 .bodyToMono(ResponseEntity.class)
                 .block();

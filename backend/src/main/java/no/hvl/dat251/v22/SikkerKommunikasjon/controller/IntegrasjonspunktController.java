@@ -12,12 +12,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -72,12 +72,12 @@ public class IntegrasjonspunktController {
         return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
     }
 
-    @PutMapping(path = "/messages/upload/{messageId}/name/{fileName}/title/{docTitle}", consumes = "application/pdf")
-    public ResponseEntity<?> uploadAttachmentToMessage(@PathVariable String messageId, @PathVariable String fileName,
-                                                       @PathVariable String docTitle, @RequestBody File file) throws IOException {
+    @PutMapping(path = "/messages/upload/{messageId}")
+    public ResponseEntity<?> uploadAttachmentToMessage(@PathVariable String messageId,
+                                                       @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType,
+                                                       @RequestHeader(HttpHeaders.CONTENT_DISPOSITION) String contentDisposition) {
 
-        log.info("yo frm upload controller");
-        ResponseEntity<?> response = service.uploadAttachment(messageId, fileName, docTitle, file);
+        ResponseEntity<?> response = service.uploadAttachment(messageId, contentType, contentDisposition);
         return response.getStatusCode().is2xxSuccessful() ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
