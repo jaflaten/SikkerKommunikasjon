@@ -6,13 +6,14 @@ import no.difi.meldingsutveksling.domain.sbdh.StandardBusinessDocument;
 import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
@@ -34,12 +35,12 @@ public class IntegrasjonspunktClient {
                 .block();
     }
 
-    public ResponseEntity<?> sendMessage(String messageId) {
+    public String sendMessage(String messageId) {
         return webClient.post()
                 .uri(getCreateUri() + "/" + messageId)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
-                .bodyToMono(ResponseEntity.class)
+                .bodyToMono(String.class)
                 .block();
     }
 
@@ -73,17 +74,17 @@ public class IntegrasjonspunktClient {
                 .block();
     }
 
-    public ResponseEntity<?> upload(String messageId, String contentTypeString, String contentDispositionString) {
+    public HttpStatus upload(String messageId, String contentTypeString, String contentDispositionString) {
         MediaType contentType = MediaType.parseMediaType(contentTypeString);
-        log.info("contentdisp is : " + contentDispositionString);
-        log.info("Content type is: " + contentType);
 
         return webClient.put()
                 .uri(getUploadUri(messageId))
                 .contentType(contentType)
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDispositionString)
                 .retrieve()
-                .bodyToMono(ResponseEntity.class)
+                .toEntity(String.class)
+                .filter(entity -> entity.getStatusCode().is2xxSuccessful() || entity.getStatusCode().is4xxClientError())
+                .flatMap(entity -> Mono.justOrEmpty(entity.getStatusCode()))
                 .block();
     }
 

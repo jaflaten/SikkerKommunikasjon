@@ -10,8 +10,9 @@ import no.hvl.dat251.v22.SikkerKommunikasjon.client.IntegrasjonspunktClient;
 import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonProperties;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.ArkivMeldingMessage;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 
@@ -53,16 +54,25 @@ public class IntegrasjonspunktService {
         return Optional.of(standardBusinessDocument);
     }
 
-    public ResponseEntity<?> sendMessage(String messageId) {
-        return client.sendMessage(messageId);
+    public Optional<JsonNode> sendMessage(String messageId) throws JsonProcessingException {
+        return Optional.of(mapper.readTree(client.sendMessage(messageId)));
     }
 
-    public ResponseEntity<?> uploadAttachment(String messageId, String contentType, String contentDisposition)  {
+    public HttpStatus uploadAttachment(String messageId, String contentType, String contentDisposition) throws JsonProcessingException {
         return client.upload(messageId, contentType, contentDisposition);
+
     }
 
     private String findMessageId(JsonNode standardBusinessDocument) {
         return standardBusinessDocument.elements().next().get("documentIdentification").get("instanceIdentifier").textValue();
+    }
+
+    public HttpStatus uploadArkivmeldingXML(String messageId) throws JsonProcessingException {
+        // TODO, create contentType og contentDisposition for arkivmelding.xml som vedlegg
+        String contentDisposition = ContentDisposition.attachment().name("arkivmelding").filename("arkivmelding.xml").build().toString();
+        String contentType = MediaType.APPLICATION_XML.getType();
+        log.info("ContentDisp of Arkivmelding is: {} + and ContentType is: {}", contentDisposition, contentType);
+        return uploadAttachment(messageId, contentType, contentDisposition);
     }
 
     public StandardBusinessDocument getStandardBusinessDocument(String receiver) {
@@ -145,7 +155,7 @@ public class IntegrasjonspunktService {
         String sbd = client.create(getStandardBusinessDocument(receiver));
         JsonNode jsonNode = mapper.readTree(sbd);
         log.info(sbd.length() > 0 ? "Successfully created message : " + jsonNode + "\n with messageId: " + findMessageId(jsonNode)
-                                     : "Failed to create message");
+                : "Failed to create message");
         return Optional.of(jsonNode);
     }
 }
