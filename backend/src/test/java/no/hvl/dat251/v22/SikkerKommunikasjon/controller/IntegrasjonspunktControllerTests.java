@@ -147,17 +147,35 @@ public class IntegrasjonspunktControllerTests {
     public void createMessageServiceCallHasEmptyResponseReturnBadRequest() throws Exception {
         when(service.createMessage(any())).thenReturn(Optional.empty());
         mockMvc.perform(multipart("/api/v1/messages/create")
-                .param("receiver", receiver))
+                        .param("receiver", receiver))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
     public void uploadAttachmentToMessageShouldSucceedAndReturn200OK() throws Exception {
         when(service.uploadAttachment(any(), any(), any())).thenReturn(HttpStatus.OK);
-        mockMvc.perform(put("/api/v1/messages/upload/foobar")
-                .header(HttpHeaders.CONTENT_DISPOSITION, "CONTENT-DISPOSITION")
+        mockMvc.perform(put("/api/v1/messages/upload/messageId")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "CONTENT-DISPOSITION")
                         .contentType("application/pdf"))
-                        .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void uploadAttachmentToMessageShouldFailAndReturn400BadRequest() throws Exception {
+        when(service.uploadAttachment(any(), any(), any())).thenReturn(HttpStatus.BAD_REQUEST);
+        mockMvc.perform(put("/api/v1/messages/upload/messageId")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "CONTENT-DISPOSITION")
+                        .contentType("bar"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void uploadArkivmeldingToMessageShouldSucceedAndReturn200OK() throws Exception {
+        when(service.uploadArkivmeldingXML(any())).thenReturn(HttpStatus.OK);
+        mockMvc.perform(put("/api/v1/messages/upload/messageId/arkivmelding")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "CONTENT-DISPOSITION")
+                        .contentType("application/pdf"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
