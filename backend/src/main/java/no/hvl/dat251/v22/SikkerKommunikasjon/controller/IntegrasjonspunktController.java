@@ -3,6 +3,7 @@ package no.hvl.dat251.v22.SikkerKommunikasjon.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Attachment;
@@ -76,23 +77,24 @@ public class IntegrasjonspunktController {
     @PutMapping(path = "/messages/upload/{messageId}")
     public ResponseEntity<?> uploadAttachmentToMessage(@PathVariable String messageId,
                                                        @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType,
-                                                       @RequestHeader(HttpHeaders.CONTENT_DISPOSITION) String contentDisposition) throws JsonProcessingException {
+                                                       @RequestHeader(HttpHeaders.CONTENT_DISPOSITION) String contentDisposition) {
         HttpStatus httpStatus = service.uploadAttachment(messageId, contentType, contentDisposition);
         return httpStatus.is2xxSuccessful() ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
     //To test service to upload arkivmelding. otherwise do it manually, but need service method to upload the arkivmelding. How to take a file in the project and add to content-disp if so ?
-    //Delete this after manual testing
+    //Delete this method after manual testing and the logic to decide which send method should be used is implemented.
     @PutMapping(path = "/messages/upload/{messageId}/arkivmelding")
-    public ResponseEntity<?> uploadArkivmeldingToMessage(@PathVariable String messageId) throws JsonProcessingException {
+    @SneakyThrows(IOException.class)
+    public ResponseEntity<?> uploadArkivmeldingToMessage(@PathVariable String messageId) {
         HttpStatus httpStatus = service.uploadArkivmeldingXML(messageId);
         return httpStatus.is2xxSuccessful() ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
-    @PostMapping(path = "messages/send")
-    public ResponseEntity<?> sendMessage(@RequestParam String messageId) throws JsonProcessingException {
-        Optional<JsonNode> response = service.sendMessage(messageId);
-        return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
+    @PostMapping(path = "messages/send/{messageId}")
+    public ResponseEntity<?> sendMessage(@PathVariable String messageId) {
+        HttpStatus httpStatus = service.sendMessage(messageId);
+        return httpStatus.is2xxSuccessful() ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
 

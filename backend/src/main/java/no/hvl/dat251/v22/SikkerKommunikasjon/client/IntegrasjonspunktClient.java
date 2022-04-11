@@ -35,12 +35,14 @@ public class IntegrasjonspunktClient {
                 .block();
     }
 
-    public String sendMessage(String messageId) {
+    public HttpStatus sendMessage(String messageId) {
         return webClient.post()
                 .uri(getCreateUri() + "/" + messageId)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
-                .bodyToMono(String.class)
+                .toEntity(String.class)
+                .filter(clientResponse -> clientResponse.getStatusCode().is2xxSuccessful() || clientResponse.getStatusCode().is4xxClientError())
+                .flatMap(clientResponse -> Mono.justOrEmpty(clientResponse.getStatusCode()))
                 .block();
     }
 
@@ -81,6 +83,21 @@ public class IntegrasjonspunktClient {
                 .uri(getUploadUri(messageId))
                 .contentType(contentType)
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDispositionString)
+                .retrieve()
+                .toEntity(String.class)
+                .filter(entity -> entity.getStatusCode().is2xxSuccessful() || entity.getStatusCode().is4xxClientError())
+                .flatMap(entity -> Mono.justOrEmpty(entity.getStatusCode()))
+                .block();
+    }
+
+    public HttpStatus upload(String messageId, String contentTypeString, String contentDispositionString, String content) {
+        MediaType contentType = MediaType.parseMediaType(contentTypeString);
+
+        return webClient.put()
+                .uri(getUploadUri(messageId))
+                .contentType(contentType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDispositionString)
+                .bodyValue(content)
                 .retrieve()
                 .toEntity(String.class)
                 .filter(entity -> entity.getStatusCode().is2xxSuccessful() || entity.getStatusCode().is4xxClientError())

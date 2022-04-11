@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -152,30 +154,23 @@ public class IntegrasjonspunktControllerTests {
 
     @Test
     public void uploadAttachmentToMessageShouldSucceedAndReturn200OK() throws Exception {
-        mockMvc.perform(multipart("/api/v1/messages/upload")
-                .param("messageId", "foobar")
-                        .param("ssn", "120592640214")
-                        .param("name", "Ola Nordmann")
-                        .param("email", "norsk.email@difi.no")
-                        .param("receiver", "507369790")
-                        .param("title", "Manglende snø i Bergen")
-                        .param("content", "Det er ikke nok snø i Bergen!")
-                        .param("isSensitive", "false"))
+        mockMvc.perform(multipart("/api/v1/messages/upload/foobar")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "CONTENT-DISPOSITION")
+                        .contentType("application/pdf"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    } //fix it
+
+    @Test
+    public void sendMessageShouldSucceedAndReturn200OK() throws Exception {
+        when(service.sendMessage(any())).thenReturn(HttpStatus.OK);
+        mockMvc.perform(multipart("/api/v1/messages/send/fooBar"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    public void sendMessageShouldSucceedAndReturn200OK() throws Exception {
-        mockMvc.perform(multipart("/api/v1/messages/send")
-                        .param("messageId", "foobar"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+    public void sendMessageServiceCallHasHttpStatusBadRequest_returnBadRequest() throws Exception {
+        when(service.sendMessage(any())).thenReturn(HttpStatus.BAD_REQUEST);
+        mockMvc.perform(multipart("/api/v1/messages/send/foobar"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
-
-//    @Test
-//    public void sendMessageServiceCallHasEmptyResponseReturnBadRequest() throws Exception {
-//        when(service.sendMessage(any())).thenReturn(ResponseEntity.badRequest().build());
-//        mockMvc.perform(multipart("/api/v1/messages/send")
-//                .param("messageId", "foobar"))
-//                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-//    }
 }
