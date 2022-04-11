@@ -25,8 +25,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(IntegrasjonspunktController.class)
@@ -154,11 +153,12 @@ public class IntegrasjonspunktControllerTests {
 
     @Test
     public void uploadAttachmentToMessageShouldSucceedAndReturn200OK() throws Exception {
-        mockMvc.perform(multipart("/api/v1/messages/upload/foobar")
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "CONTENT-DISPOSITION")
+        when(service.uploadAttachment(any(), any(), any())).thenReturn(HttpStatus.OK);
+        mockMvc.perform(put("/api/v1/messages/upload/foobar")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "CONTENT-DISPOSITION")
                         .contentType("application/pdf"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    } //fix it
+                        .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 
     @Test
     public void sendMessageShouldSucceedAndReturn200OK() throws Exception {
