@@ -3,6 +3,7 @@ package no.hvl.dat251.v22.SikkerKommunikasjon.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Attachment;
@@ -12,6 +13,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +33,8 @@ import java.util.Optional;
 @RequestMapping("/api/v1")
 public class IntegrasjonspunktController {
 
-    private final IntegrasjonspunktService service;
+    private final IntegrasjonspunktService
+            service;
 
     @CrossOrigin
     @GetMapping("/capabilities/{orgnr}")
@@ -64,6 +68,34 @@ public class IntegrasjonspunktController {
         return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
     }
 
+    @PostMapping(path = "/messages/create")
+    public ResponseEntity<?> createMessage(@RequestParam String receiver) throws JsonProcessingException {
+        Optional<JsonNode> response = service.createMessage(receiver);
+        return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
+    }
+
+    @PutMapping(path = "/messages/upload/{messageId}")
+    public ResponseEntity<?> uploadAttachmentToMessage(@PathVariable String messageId,
+                                                       @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType,
+                                                       @RequestHeader(HttpHeaders.CONTENT_DISPOSITION) String contentDisposition) {
+        HttpStatus httpStatus = service.uploadAttachment(messageId, contentType, contentDisposition);
+        return httpStatus.is2xxSuccessful() ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    }
+
+    //To test service to upload arkivmelding. otherwise do it manually, but need service method to upload the arkivmelding. How to take a file in the project and add to content-disp if so ?
+    //Delete this method after manual testing and the logic to decide which send method should be used is implemented.
+    @PutMapping(path = "/messages/upload/{messageId}/arkivmelding")
+    @SneakyThrows(IOException.class)
+    public ResponseEntity<?> uploadArkivmeldingToMessage(@PathVariable String messageId) {
+        HttpStatus httpStatus = service.uploadArkivmeldingXML(messageId);
+        return httpStatus.is2xxSuccessful() ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    }
+
+    @PostMapping(path = "messages/send/{messageId}")
+    public ResponseEntity<?> sendMessage(@PathVariable String messageId) {
+        HttpStatus httpStatus = service.sendMessage(messageId);
+        return httpStatus.is2xxSuccessful() ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    }
 
 
     public Arkivmelding createArkivmelding(FormData form, MultipartFile attachment) throws IOException {
@@ -94,6 +126,7 @@ public class IntegrasjonspunktController {
 
         return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
+
     private String getFile(Resource resource) throws IOException {
         return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }

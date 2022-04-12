@@ -1,18 +1,23 @@
 package no.hvl.dat251.v22.SikkerKommunikasjon.service;
 
 import no.difi.meldingsutveksling.domain.sbdh.*;
+import no.hvl.dat251.v22.SikkerKommunikasjon.client.IntegrasjonspunktClient;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.ArkivMeldingMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -20,6 +25,9 @@ public class IntegrasjonspunktServiceTests {
 
     @Autowired
     IntegrasjonspunktService service;
+
+    @MockBean
+    IntegrasjonspunktClient client;
 
     Partner partner;
     Partner senderPartner;
@@ -126,5 +134,15 @@ public class IntegrasjonspunktServiceTests {
         assertEquals(header.getBusinessScope().getScope().iterator().next().getIdentifier(), "urn:no:difi:profile:arkivmelding:administrasjon:ver1.0");
         assertEquals(header.getBusinessScope().getScope().iterator().next().getType(), "ConversationId");
     }
+
+    @Test
+    public void uploadAttachmentShouldSucceed() {
+        when(client.upload(any(), any(), any())).thenReturn(HttpStatus.OK);
+
+        HttpStatus httpStatus = service.uploadAttachment(any(), any(), any());
+        assertEquals(HttpStatus.OK, httpStatus);
+        verify(client, times(1)).upload(any(), any(), any());
+    }
+
 
 }
