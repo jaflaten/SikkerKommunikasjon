@@ -10,6 +10,7 @@ import no.hvl.dat251.v22.SikkerKommunikasjon.client.IntegrasjonspunktClient;
 import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonProperties;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.ArkivMeldingMessage;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
+import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Attachment;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
@@ -49,10 +50,27 @@ public class IntegrasjonspunktService {
         String response = client.sendMultipartMessage(builder.build());
         JsonNode standardBusinessDocument = mapper.readTree(response);
         log.info("New message created with messageId: {}", findMessageId(standardBusinessDocument));
+
+        Optional<Attachment> attachment =
+                melding.getAttachments()
+                .stream()
+                .filter(p -> p.getFilename().equals("form"))
+                .findFirst();
+
+        if (attachment.isPresent()) {
+            System.out.println(attachment.get().getContent());
+        }
+
+        // Cache the messageId along with the user email
+        EmailService.addEmailMessageIdPair(
+                "",
+                findMessageId(standardBusinessDocument)
+        );
+
         return Optional.of(standardBusinessDocument);
     }
 
-    private String findMessageId(JsonNode standardBusinessDocument) {
+    private static String findMessageId(JsonNode standardBusinessDocument) {
         return standardBusinessDocument.elements().next().get("documentIdentification").get("instanceIdentifier").textValue();
     }
 
@@ -108,28 +126,4 @@ public class IntegrasjonspunktService {
 
         return identification;
     }
-
-    @PostConstruct
-    public void postMessageStatusSubscription() {
-        String hostName = System.getenv("HOST_NAME");
-        log.info("Host name for this environment is: " + hostName);
-
-
-        String body = "{\n" +
-                "  \"name\" : \"Incoming messages\",\n" +
-                "  \"pushEndpoint\" : \"https://sk-staging-backend.herokuapp.com/api/v1/messaging/incoming\",\n" +
-                "  \"resource\" : \"messages\",\n" +
-                "  \"event\" : \"status\",\n" +
-                "  \"filter\" : \"status=INNKOMMENDE_MOTTAT&direction=INCOMING\"\n" +
-                "}";
-
-        try {
-            String res = client.subscribe(body);
-            log.info(res);
-        } catch (RuntimeException e) {
-            log.error(e.toString());
-        }
-
-    }
-
 }
