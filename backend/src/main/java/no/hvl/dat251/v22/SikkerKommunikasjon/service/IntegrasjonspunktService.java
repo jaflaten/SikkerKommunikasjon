@@ -10,6 +10,7 @@ import no.hvl.dat251.v22.SikkerKommunikasjon.client.IntegrasjonspunktClient;
 import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonProperties;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.ArkivMeldingMessage;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
+import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Attachment;
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ContentDisposition;
@@ -23,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +57,39 @@ public class IntegrasjonspunktService {
         String response = client.sendMultipartMessage(builder.build());
         JsonNode standardBusinessDocument = mapper.readTree(response);
         log.info("New message created with messageId: {}", findMessageId(standardBusinessDocument));
+
+        Optional<Attachment> attachment =
+                melding.getAttachments()
+                .stream()
+                .filter(p -> p.getFilename().equals("form"))
+                .findFirst();
+
+        if (attachment.isPresent()) {
+            String email = findEmail(attachment.get());
+            String messageId = findMessageId(standardBusinessDocument);
+
+            if (!email.equals("") && !messageId.equals("")) {
+                // Cache the messageId along with the user email
+                EmailService.addEmailMessageIdPair(
+                        email,
+                        messageId
+                );
+            }
+        }
+
         return Optional.of(standardBusinessDocument);
+    }
+
+    /** Procedure for finding email is from: https://stackoverflow.com/a/15703751 **/
+    private static String findEmail(Attachment attachment) {
+        Matcher matcher = Pattern.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
+                .matcher(attachment.getContent());
+
+        while (matcher.find()) {
+            return matcher.group();
+        }
+
+        return null;
     }
 
     public HttpStatus sendMessage(String messageId) {
@@ -146,28 +181,5 @@ public class IntegrasjonspunktService {
         identification.setType("arkivmelding");
 
         return identification;
-    }
-
-    @PostConstruct
-    public void postMessageStatusSubscription() {
-        String hostName = System.getenv("HOST_NAME");
-        log.info("Host name for this environment is: " + hostName);
-
-
-        String body = "{\n" +
-                "  \"name\" : \"Incoming messages\",\n" +
-                "  \"pushEndpoint\" : \"https://sk-staging-backend.herokuapp.com/api/v1/messaging/incoming\",\n" +
-                "  \"resource\" : \"messages\",\n" +
-                "  \"event\" : \"status\",\n" +
-                "  \"filter\" : \"status=INNKOMMENDE_MOTTAT&direction=INCOMING\"\n" +
-                "}";
-
-        try {
-            String res = client.subscribe(body);
-            log.info(res);
-        } catch (RuntimeException e) {
-            log.error(e.toString());
-        }
-
     }
 }

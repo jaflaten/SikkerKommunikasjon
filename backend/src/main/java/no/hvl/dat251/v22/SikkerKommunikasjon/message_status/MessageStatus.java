@@ -11,6 +11,7 @@ public class MessageStatus {
 
     private final Status status;
     private final Direction direction;
+    private final String id;
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -20,10 +21,11 @@ public class MessageStatus {
 
             Status status = Status.valueOf(node.get("status").asText());
             Direction direction = Direction.valueOf(node.get("direction").asText());
+            String id = node.get("messageId").asText();
 
-            return new MessageStatus(status, direction);
+            return new MessageStatus(status, direction, id);
         } catch (Exception e) {
-            return new MessageStatus(Status.FEIL, Direction.NONE);
+            return new MessageStatus(Status.FEIL, Direction.NONE, "-1");
         }
     }
 }
