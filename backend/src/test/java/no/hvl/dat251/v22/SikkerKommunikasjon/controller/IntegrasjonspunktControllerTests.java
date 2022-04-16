@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,7 +25,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(IntegrasjonspunktController.class)
@@ -129,6 +131,64 @@ public class IntegrasjonspunktControllerTests {
                         .param("title", "Manglende snø i Bergen")
                         .param("content", "Det er ikke nok snø i Bergen!")
                         .param("isSensitive", "false"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void createMessageShouldSucceedAndReturn200OK() throws Exception {
+        when(service.createMessage(any())).thenReturn(jsonOptional);
+        mockMvc.perform(multipart("/api/v1/messages/create")
+                        .param("receiver", receiver))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+    }
+
+    @Test
+    public void createMessageServiceCallHasEmptyResponseReturnBadRequest() throws Exception {
+        when(service.createMessage(any())).thenReturn(Optional.empty());
+        mockMvc.perform(multipart("/api/v1/messages/create")
+                        .param("receiver", receiver))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void uploadAttachmentToMessageShouldSucceedAndReturn200OK() throws Exception {
+        when(service.uploadAttachment(any(), any(), any())).thenReturn(HttpStatus.OK);
+        mockMvc.perform(put("/api/v1/messages/upload/messageId")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "CONTENT-DISPOSITION")
+                        .contentType("application/pdf"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void uploadAttachmentToMessageShouldFailAndReturn400BadRequest() throws Exception {
+        when(service.uploadAttachment(any(), any(), any())).thenReturn(HttpStatus.BAD_REQUEST);
+        mockMvc.perform(put("/api/v1/messages/upload/messageId")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "CONTENT-DISPOSITION")
+                        .contentType("bar"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void uploadArkivmeldingToMessageShouldSucceedAndReturn200OK() throws Exception {
+        when(service.uploadArkivmeldingXML(any())).thenReturn(HttpStatus.OK);
+        mockMvc.perform(put("/api/v1/messages/upload/messageId/arkivmelding")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "CONTENT-DISPOSITION")
+                        .contentType("application/pdf"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void sendMessageShouldSucceedAndReturn200OK() throws Exception {
+        when(service.sendMessage(any())).thenReturn(HttpStatus.OK);
+        mockMvc.perform(multipart("/api/v1/messages/send/fooBar"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void sendMessageServiceCallHasHttpStatusBadRequest_returnBadRequest() throws Exception {
+        when(service.sendMessage(any())).thenReturn(HttpStatus.BAD_REQUEST);
+        mockMvc.perform(multipart("/api/v1/messages/send/foobar"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }

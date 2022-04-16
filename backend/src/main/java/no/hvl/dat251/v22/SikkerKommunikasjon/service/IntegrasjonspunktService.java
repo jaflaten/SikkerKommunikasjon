@@ -11,11 +11,16 @@ import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonPropertie
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.ArkivMeldingMessage;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Attachment;
+import org.apache.commons.io.FileUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
@@ -87,8 +92,42 @@ public class IntegrasjonspunktService {
         return null;
     }
 
-    private static String findMessageId(JsonNode standardBusinessDocument) {
+    public HttpStatus sendMessage(String messageId) {
+        var res = client.sendMessage(messageId);
+        log.info(res.is2xxSuccessful() ? "Successfully sent message: " + messageId
+                : "Failed to send message: " + messageId);
+        return res;
+    }
+
+    public HttpStatus uploadAttachment(String messageId, String contentType, String contentDisposition) {
+        var res = client.upload(messageId, contentType, contentDisposition);
+        log.info(res.is2xxSuccessful() ? "Succesfully uploaded attachment to message: " + messageId
+                : "Failed to upload attachment to message: " + messageId);
+        return res;
+    }
+
+    private String findMessageId(JsonNode standardBusinessDocument) {
         return standardBusinessDocument.elements().next().get("documentIdentification").get("instanceIdentifier").textValue();
+    }
+
+    public HttpStatus uploadArkivmeldingXML(String messageId) throws IOException {
+        String contentDisposition = ContentDisposition.attachment().name("arkivmelding").filename("arkivmelding.xml").build().toString();
+        String contentType = "text/xml";
+        File arkivmeldingXML = new ClassPathResource("arkivmelding.xml").getFile();
+        String content = FileUtils.readFileToString(arkivmeldingXML, "UTF-8").trim().replaceFirst("^([\\W]+)<", "<");
+
+        var res = client.upload(messageId, contentType, contentDisposition, content);
+        log.info(res.is2xxSuccessful() ? "Succesfully uploaded arkivmeldingXml to message: " + messageId
+                                        : "Failed to upload arkivmeldingXML to message: " + messageId);
+        return res;
+    }
+
+    public Optional<JsonNode> createMessage(String receiver) throws JsonProcessingException {
+        String sbd = client.create(getStandardBusinessDocument(receiver));
+        JsonNode jsonNode = mapper.readTree(sbd);
+        log.info(sbd.length() > 0 ? "Successfully created message with id: " + findMessageId(jsonNode) + " and SBD: " + jsonNode
+                : "Failed to create message");
+        return Optional.of(jsonNode);
     }
 
     public StandardBusinessDocument getStandardBusinessDocument(String receiver) {

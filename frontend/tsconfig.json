@@ -8,7 +8,7 @@
     "allowJs": true,
     "moduleResolution": "node",
     "module": "commonJS",
-    "lib": ["es6", "dom"],
+    "lib": ["es6", "dom", "es2021"],
     "target": "ES5",
     "jsx": "react-jsx"
   },
