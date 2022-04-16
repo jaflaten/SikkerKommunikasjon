@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Attachment;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.FormData;
+import no.hvl.dat251.v22.SikkerKommunikasjon.service.EmailService;
 import no.hvl.dat251.v22.SikkerKommunikasjon.service.IntegrasjonspunktService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -61,6 +62,7 @@ public class IntegrasjonspunktController {
         FormData formData = new FormData(ssn, name, email, receiver, title, content, isSensitive);
         Arkivmelding arkivmelding = createArkivmelding(formData, attachment);
         Optional<JsonNode> response = service.sendMultipartMessage(arkivmelding);
+
         return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
     }
 

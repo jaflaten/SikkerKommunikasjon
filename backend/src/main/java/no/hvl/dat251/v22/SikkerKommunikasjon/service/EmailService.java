@@ -13,6 +13,10 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+
 @Slf4j
 @Service
 public class EmailService {
@@ -20,7 +24,13 @@ public class EmailService {
     /**
      * The email sikkerkommunikasjon sends it's emails from
      */
-    public static final String SIKKERKOMMUNIKASJON_EMAIL = "sikkerkomm_test@protonmail.com";
+    public static final String SIKKERKOMMUNIKASJON_EMAIL = "sikkerkomm@protonmail.com";
+
+    /**
+     * Stores emails, with given message_id as key.
+     * Only lives as long as program lives.
+     */
+    public static final Dictionary<String, String> MESSAGEID_TO_EMAIL = new Hashtable<>();
 
     /**
      * If the email service is operational, e.g. correct api-keys are set
@@ -28,6 +38,14 @@ public class EmailService {
     private boolean isEnabled;
 
     private MailjetClient client;
+
+    public static void addEmailMessageIdPair(String email, String messageId) {
+        MESSAGEID_TO_EMAIL.put(messageId, email);
+    }
+
+    public static String emailFromMessageId(String messageId) {
+        return MESSAGEID_TO_EMAIL.get(messageId);
+    }
 
     @Autowired
     public EmailService() {

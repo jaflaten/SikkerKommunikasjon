@@ -25,10 +25,13 @@ public class MessageStatusService {
 
         log.info("Received body from integrasjonspunktet with status: " + messageStatus);
 
+        // Get email from messageId
+        String messageId = messageStatus.getId();
+        String email = EmailService.emailFromMessageId(messageId);
+
         // notify associated user about the updated status
-        String dummyEmail = "yavor45031@sartess.com";  // Generated from https://temp-mail.org/en/
         emailService.sendSimpleEmail(
-                dummyEmail,
+                email,
                 "Updated Status",
                 "Updated status:  " + messageStatus.getStatus() +
                         "\nDirection: " + messageStatus.getDirection() +
