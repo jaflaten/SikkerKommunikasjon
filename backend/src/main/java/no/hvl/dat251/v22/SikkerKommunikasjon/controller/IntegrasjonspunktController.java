@@ -53,7 +53,6 @@ public class IntegrasjonspunktController {
                                          @RequestParam Boolean isSensitive, @RequestParam("attachment") File attachment) throws IOException {
 
         FormData formData = new FormData(ssn, name, email, receiver, title, content, isSensitive);
-
         Optional<JsonNode> response = service.messageHandler(formData, attachment);
 
         return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
@@ -66,7 +65,6 @@ public class IntegrasjonspunktController {
                                                   @RequestParam Boolean isSensitive, @RequestParam("attachment") File attachment) throws IOException {
 
         FormData formData = new FormData(ssn, name, email, receiver, title, content, isSensitive);
-
         Optional<JsonNode> response = service.sendMultipartMessage(formData, attachment);
 
         return response.isPresent() ? ResponseEntity.ok(response.get()) : ResponseEntity.badRequest().build();
