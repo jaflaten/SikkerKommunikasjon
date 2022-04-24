@@ -11,8 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -50,7 +50,7 @@ public class IntegrasjonspunktController {
     public ResponseEntity<?> sendMessage(@RequestParam String ssn, @RequestParam String name,
                                          @RequestParam String email, @RequestParam String receiver,
                                          @RequestParam String title, @RequestParam String content,
-                                         @RequestParam Boolean isSensitive, @RequestParam("attachment") MultipartFile attachment) throws IOException {
+                                         @RequestParam Boolean isSensitive, @RequestParam("attachment") File attachment) throws IOException {
 
         FormData formData = new FormData(ssn, name, email, receiver, title, content, isSensitive);
 
@@ -63,7 +63,7 @@ public class IntegrasjonspunktController {
     public ResponseEntity<?> sendMultipartMessage(@RequestParam String ssn, @RequestParam String name,
                                                   @RequestParam String email, @RequestParam String receiver,
                                                   @RequestParam String title, @RequestParam String content,
-                                                  @RequestParam Boolean isSensitive, @RequestParam("attachment") MultipartFile attachment) throws IOException {
+                                                  @RequestParam Boolean isSensitive, @RequestParam("attachment") File attachment) throws IOException {
 
         FormData formData = new FormData(ssn, name, email, receiver, title, content, isSensitive);
 
