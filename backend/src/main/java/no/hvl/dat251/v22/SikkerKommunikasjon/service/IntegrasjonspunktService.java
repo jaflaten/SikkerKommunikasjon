@@ -98,7 +98,7 @@ public class IntegrasjonspunktService {
 
         String response = client.sendMultipartMessage(builder.build());
         JsonNode standardBusinessDocument = mapper.readTree(response);
-        log.info("New message created with messageId: {}", findMessageId(standardBusinessDocument));
+        log.info("New multipart message created and sent with messageId: {}", findMessageId(standardBusinessDocument));
 
         Optional<Attachment> attachment =
                 melding.getAttachments()
