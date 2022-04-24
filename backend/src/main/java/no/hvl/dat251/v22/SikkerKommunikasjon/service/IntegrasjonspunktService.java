@@ -11,17 +11,24 @@ import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonPropertie
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.ArkivMeldingMessage;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Attachment;
+import no.hvl.dat251.v22.SikkerKommunikasjon.domain.FormData;
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -35,6 +42,8 @@ public class IntegrasjonspunktService {
     private static String TYPE_VERSION = "1.0";
     private static String HEADER_VERSION = "1.0";
 
+    private static long FIVE_MEGABYTES = 5000000;
+
     ObjectMapper mapper = new ObjectMapper();
     private final IntegrasjonspunktClient client;
     private final SikkerKommunikasjonProperties properties;
@@ -44,7 +53,40 @@ public class IntegrasjonspunktService {
         return Optional.of(mapper.readTree(client.getCapabilities(identifier)));
     }
 
-    public Optional<JsonNode> sendMultipartMessage(Arkivmelding melding) throws IOException {
+    public Optional<JsonNode> messageHandler(FormData form, MultipartFile multipartFile) throws IOException {
+
+        if (multipartFile.getSize() > FIVE_MEGABYTES) {
+
+            Optional<JsonNode> node = createMessage(form.getReceiver());
+
+            if (node.isPresent()) {
+
+                String messageId = findMessageId(node.get());
+                String fileName = multipartFile.getResource().getFile().getName();
+                String contentDisposition = "attachment; name=" + fileName.split(".")[0] + "; fileName=" + fileName;
+
+                HttpStatus httpStatusAttachment = uploadAttachment(messageId, multipartFile.getContentType(), contentDisposition);
+                HttpStatus httpStatusArkivmelding = uploadArkivmeldingXML(messageId);
+
+                if (httpStatusArkivmelding.is2xxSuccessful() && httpStatusAttachment.is2xxSuccessful()) {
+                    HttpStatus sendStatus = sendMessage(messageId);
+                    return sendStatus.is2xxSuccessful() ? Optional.of(mapper.readTree(sendStatus.toString())) : Optional.empty();
+                }
+            } else {
+                log.info("Message handler failed to create large message");
+                return Optional.empty();
+            }
+        } else {
+            return sendMultipartMessage(form, multipartFile);
+        }
+        return Optional.empty();
+    }
+
+
+    public Optional<JsonNode> sendMultipartMessage(FormData form, MultipartFile file) throws IOException {
+
+        Arkivmelding melding = createArkivmelding(form, file);
+
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("sbd", getStandardBusinessDocument(melding.getReceiver()), MediaType.APPLICATION_JSON);
         builder.part("arkivmelding", melding.getMainDocument(), MediaType.APPLICATION_XML).filename("arkivmelding.xml");
@@ -60,9 +102,9 @@ public class IntegrasjonspunktService {
 
         Optional<Attachment> attachment =
                 melding.getAttachments()
-                .stream()
-                .filter(p -> p.getFilename().equals("form"))
-                .findFirst();
+                        .stream()
+                        .filter(p -> p.getFilename().equals("form"))
+                        .findFirst();
 
         if (attachment.isPresent()) {
             String email = findEmail(attachment.get());
@@ -80,7 +122,9 @@ public class IntegrasjonspunktService {
         return Optional.of(standardBusinessDocument);
     }
 
-    /** Procedure for finding email is from: https://stackoverflow.com/a/15703751 **/
+    /**
+     * Procedure for finding email is from: https://stackoverflow.com/a/15703751
+     **/
     private static String findEmail(Attachment attachment) {
         Matcher matcher = Pattern.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
                 .matcher(attachment.getContent());
@@ -118,7 +162,7 @@ public class IntegrasjonspunktService {
 
         var res = client.upload(messageId, contentType, contentDisposition, content);
         log.info(res.is2xxSuccessful() ? "Succesfully uploaded arkivmeldingXml to message: " + messageId
-                                        : "Failed to upload arkivmeldingXML to message: " + messageId);
+                : "Failed to upload arkivmeldingXML to message: " + messageId);
         return res;
     }
 
@@ -181,5 +225,38 @@ public class IntegrasjonspunktService {
         identification.setType("arkivmelding");
 
         return identification;
+    }
+
+    public Arkivmelding createArkivmelding(FormData form, MultipartFile attachment) throws IOException {
+        Attachment a1 = Attachment.builder()
+                .filename("test.pdf")
+                .content(getFile(attachment.getResource()))
+                .contentType(MediaType.APPLICATION_PDF)
+                .build();
+
+        List<Attachment> attachments = new ArrayList<>();
+        attachments.add(a1);
+        attachments.add(Attachment.builder()
+                .filename("form")
+                .content(form.toString())
+                .contentType(MediaType.TEXT_PLAIN)
+                .build());
+
+        return Arkivmelding.builder()
+                .receiver(form.getReceiver())
+                .mainDocument(getFile(new ClassPathResource("arkivmelding.xml").getPath()))
+                .attachments(attachments)
+                .build();
+    }
+
+    private String getFile(String path) throws IOException {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource(path);
+
+        return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    }
+
+    private String getFile(Resource resource) throws IOException {
+        return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 }

@@ -105,7 +105,7 @@ public class IntegrasjonspunktControllerTests {
 
     @Test
     public void sendMultipartMessageShouldReturn200Ok() throws Exception {
-        when(service.sendMultipartMessage(any())).thenReturn(jsonOptional);
+        when(service.sendMultipartMessage(any(), any())).thenReturn(jsonOptional);
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/messages/multipart")
                         .file(mockMultipartFile)
@@ -121,7 +121,7 @@ public class IntegrasjonspunktControllerTests {
 
     @Test
     public void sendMultipartMessageServiceCallHasEmptyResponseReturnBadRequest() throws Exception {
-        when(service.sendMultipartMessage(any())).thenReturn(Optional.empty());
+        when(service.sendMultipartMessage(any(), any())).thenReturn(Optional.empty());
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/messages/multipart")
                         .file(mockMultipartFile)
                         .param("ssn", "120592640214")
