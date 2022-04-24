@@ -22,12 +22,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,24 +53,29 @@ public class IntegrasjonspunktService {
         return Optional.of(mapper.readTree(client.getCapabilities(identifier)));
     }
 
-    public Optional<JsonNode> messageHandler(FormData form, File file) throws IOException {
+    public Optional<JsonNode> messageHandler(FormData form, MultipartFile attachment) throws IOException {
 
-        if (file.length() > FIVE_MEGABYTES) {
+        if (attachment.getSize() > FIVE_MEGABYTES) {
 
+            log.info("less than 5 MB...");
             Optional<JsonNode> node = createMessage(form.getReceiver());
 
             if (node.isPresent()) {
-
                 String messageId = findMessageId(node.get());
-                String fileName = file.getName();
-                String contentDisposition = "attachment; name=" + fileName.split(".")[0] + "; fileName=" + fileName;
-                String contentType = URLConnection.getFileNameMap().getContentTypeFor(fileName);
+                String fileName = attachment.getOriginalFilename();
+                String name = fileName.split("\\.")[0];
+
+                String contentDisposition = ContentDisposition.attachment().name(name).filename(fileName).build().toString();
+                String contentType = attachment.getContentType();
+                log.info(contentDisposition);
 
                 HttpStatus httpStatusAttachment = uploadAttachment(messageId, contentType, contentDisposition);
                 HttpStatus httpStatusArkivmelding = uploadArkivmeldingXML(messageId);
 
                 if (httpStatusArkivmelding.is2xxSuccessful() && httpStatusAttachment.is2xxSuccessful()) {
+                    log.info("sending large message..");
                     HttpStatus sendStatus = sendMessage(messageId);
+                    log.info(String.valueOf(sendStatus.value()));
                     return sendStatus.is2xxSuccessful() ? Optional.of(mapper.readTree(sendStatus.toString())) : Optional.empty();
                 }
             } else {
@@ -79,15 +83,15 @@ public class IntegrasjonspunktService {
                 return Optional.empty();
             }
         } else {
-            return sendMultipartMessage(form, file);
+            return sendMultipartMessage(form, attachment);
         }
         return Optional.empty();
     }
 
 
-    public Optional<JsonNode> sendMultipartMessage(FormData form, File file) throws IOException {
+    public Optional<JsonNode> sendMultipartMessage(FormData form, MultipartFile multipartFile) throws IOException {
 
-        Arkivmelding melding = createArkivmelding(form, file);
+        Arkivmelding melding = createArkivmelding(form, multipartFile);
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("sbd", getStandardBusinessDocument(melding.getReceiver()), MediaType.APPLICATION_JSON);
@@ -146,6 +150,7 @@ public class IntegrasjonspunktService {
     }
 
     public HttpStatus uploadAttachment(String messageId, String contentType, String contentDisposition) {
+        log.info("cd = " + contentDisposition + " ct = " + contentType + " id: " + messageId);
         var res = client.upload(messageId, contentType, contentDisposition);
         log.info(res.is2xxSuccessful() ? "Succesfully uploaded attachment to message: " + messageId
                 : "Failed to upload attachment to message: " + messageId);
@@ -229,10 +234,10 @@ public class IntegrasjonspunktService {
         return identification;
     }
 
-    public Arkivmelding createArkivmelding(FormData form, File attachment) throws IOException {
+    public Arkivmelding createArkivmelding(FormData form, MultipartFile attachment) throws IOException {
         Attachment a1 = Attachment.builder()
                 .filename("test.pdf")
-                .content(Files.readString(attachment.toPath()))
+                .content(getFile(attachment.getResource()))
                 .contentType(MediaType.APPLICATION_PDF)
                 .build();
 
@@ -255,6 +260,10 @@ public class IntegrasjonspunktService {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
         Resource resource = resourceLoader.getResource(path);
 
+        return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    }
+
+    private String getFile(Resource resource) throws IOException {
         return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 }
