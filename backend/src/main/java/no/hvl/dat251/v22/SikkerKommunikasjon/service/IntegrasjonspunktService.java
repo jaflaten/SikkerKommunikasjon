@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import no.difi.meldingsutveksling.domain.sbdh.*;
 import no.hvl.dat251.v22.SikkerKommunikasjon.client.IntegrasjonspunktClient;
 import no.hvl.dat251.v22.SikkerKommunikasjon.config.SikkerKommunikasjonProperties;
@@ -19,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -56,26 +56,9 @@ public class IntegrasjonspunktService {
 
         String response = client.sendMultipartMessage(builder.build());
         JsonNode standardBusinessDocument = mapper.readTree(response);
-        log.info("New message created with messageId: {}", findMessageId(standardBusinessDocument));
-
-        Optional<Attachment> attachment =
-                melding.getAttachments()
-                .stream()
-                .filter(p -> p.getFilename().equals("form"))
-                .findFirst();
-
-        if (attachment.isPresent()) {
-            String email = findEmail(attachment.get());
-            String messageId = findMessageId(standardBusinessDocument);
-
-            if (!email.equals("") && !messageId.equals("")) {
-                // Cache the messageId along with the user email
-                EmailService.addEmailMessageIdPair(
-                        email,
-                        messageId
-                );
-            }
-        }
+        val messageId = findMessageId(standardBusinessDocument);
+        log.info("New message created with messageId: {}", messageId);
+        sendEmailToUser(melding, messageId);
 
         return Optional.of(standardBusinessDocument);
     }
@@ -181,5 +164,25 @@ public class IntegrasjonspunktService {
         identification.setType("arkivmelding");
 
         return identification;
+    }
+
+    public void sendEmailToUser(Arkivmelding melding, String messageId) {
+        Optional<Attachment> attachment =
+                melding.getAttachments()
+                        .stream()
+                        .filter(p -> p.getFilename().equals("form"))
+                        .findFirst();
+
+        if (attachment.isPresent()) {
+            String email = findEmail(attachment.get());
+
+            if (!email.equals("") && !messageId.equals("")) {
+                // Cache the messageId along with the user email
+                EmailService.addEmailMessageIdPair(
+                        email,
+                        messageId
+                );
+            }
+        }
     }
 }
