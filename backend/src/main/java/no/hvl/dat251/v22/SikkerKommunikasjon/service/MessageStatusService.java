@@ -25,6 +25,10 @@ public class MessageStatusService {
 
         log.info("Received body from integrasjonspunktet with status: " + messageStatus);
 
+        // Only send email if status == SENDT
+        if (messageStatus.getStatus() != Status.SENDT)
+            return;
+
         // Get email from messageId
         String messageId = messageStatus.getId();
         String email = EmailService.emailFromMessageId(messageId);
@@ -32,7 +36,7 @@ public class MessageStatusService {
         // notify associated user about the updated status
         emailService.sendSimpleEmail(
                 email,
-                "Updated Status",
+                "Updated Status: " + messageStatus.getStatus(),
                 "Updated status:  " + messageStatus.getStatus() +
                         "\nDirection: " + messageStatus.getDirection() +
                         "\nID: " + messageStatus.getId()
