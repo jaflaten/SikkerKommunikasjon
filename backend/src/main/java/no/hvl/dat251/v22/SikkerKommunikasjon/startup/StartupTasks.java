@@ -72,7 +72,9 @@ public class StartupTasks {
             log.info("Successfully subscribed to Integrasjonspunktet, response:\n" + res);
         } catch (WebClientResponseException e) {
             if (e.getStatusCode().is4xxClientError())
-                log.warn("Error while trying to subscribe to message statuses (maybe already subscribed?): " + e.getStatusText());
+                log.warn("Couldn't subscribe to message statuses, maybe already subscribed?");
+            else
+                e.printStackTrace();
         } catch (Exception e) {
             log.error("Error while trying to subscribe to message statuses.");
         }
