@@ -18,3 +18,7 @@ Sett følgende miljøvariabler, som kan hentes fra [mailjet](https://www.mailjet
 
 * `MJ_APIKEY_PUBLIC=[din OFFENTLIGE api-nøkkel fra mailjet]`
 * `MJ_APIKEY_PRIVATE=[din PRIVATE api-nøkkel fra mailjet]`
+
+### For å generere Swagger for prosjekt
+
+Start `backend`, og gå til siden http://127.0.0.1:1337/swagger-ui/index.html.
