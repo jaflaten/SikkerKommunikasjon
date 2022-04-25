@@ -24,8 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import no.hvl.dat251.v22.SikkerKommunikasjon.service.EmailService;
 
 @Service
 @RequiredArgsConstructor
@@ -61,18 +61,6 @@ public class IntegrasjonspunktService {
         sendEmailToUser(melding, messageId);
 
         return Optional.of(standardBusinessDocument);
-    }
-
-    /** Procedure for finding email is from: https://stackoverflow.com/a/15703751 **/
-    private static String findEmail(Attachment attachment) {
-        Matcher matcher = Pattern.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
-                .matcher(attachment.getContent());
-
-        while (matcher.find()) {
-            return matcher.group();
-        }
-
-        return null;
     }
 
     public HttpStatus sendMessage(String messageId) {
@@ -174,7 +162,11 @@ public class IntegrasjonspunktService {
                         .findFirst();
 
         if (attachment.isPresent()) {
-            String email = findEmail(attachment.get());
+            String email = EmailService.findEmail(attachment.get().getContent());
+            if (email == null) {
+                log.error("Could not find email in attachment.");
+                return;
+            }
 
             if (!email.equals("") && !messageId.equals("")) {
                 // Cache the messageId along with the user email

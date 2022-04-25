@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Arkivmelding;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Attachment;
 import no.hvl.dat251.v22.SikkerKommunikasjon.domain.FormData;
-import no.hvl.dat251.v22.SikkerKommunikasjon.service.EmailService;
 import no.hvl.dat251.v22.SikkerKommunikasjon.service.IntegrasjonspunktService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.DefaultResourceLoader;

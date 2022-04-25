@@ -8,14 +8,16 @@ import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
 import lombok.extern.slf4j.Slf4j;
+import no.hvl.dat251.v22.SikkerKommunikasjon.domain.Attachment;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -102,5 +104,17 @@ public class EmailService {
             log.error("Error when sending email:");
             e.printStackTrace();
         }
+    }
+
+    /** Procedure for finding email is from: https://stackoverflow.com/a/15703751 **/
+    public static String findEmail(String s) {
+        Matcher matcher = Pattern.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
+                .matcher(s);
+
+        while (matcher.find()) {
+            return matcher.group();
+        }
+
+        return null;
     }
 }
