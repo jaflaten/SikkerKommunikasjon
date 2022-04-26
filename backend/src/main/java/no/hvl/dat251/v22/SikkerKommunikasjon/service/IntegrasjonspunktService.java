@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
-import no.hvl.dat251.v22.SikkerKommunikasjon.service.EmailService;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
