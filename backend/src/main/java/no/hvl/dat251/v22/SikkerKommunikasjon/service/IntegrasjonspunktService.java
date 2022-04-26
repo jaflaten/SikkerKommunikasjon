@@ -156,10 +156,10 @@ public class IntegrasjonspunktService {
 
     public void sendEmailToUser(Arkivmelding melding, String messageId) {
         Optional<Attachment> attachment =
-                melding.getAttachments()
-                        .stream()
-                        .filter(p -> p.getFilename().equals("form"))
-                        .findFirst();
+            melding.getAttachments()
+                .stream()
+                .filter(p -> p.getFilename().equals("form"))
+                .findFirst();
 
         if (attachment.isPresent()) {
             String email = emailService.findEmail(attachment.get().getContent());
@@ -171,8 +171,8 @@ public class IntegrasjonspunktService {
             if (!email.equals("") && !messageId.equals("")) {
                 // Cache the messageId along with the user email
                 emailService.addEmailMessageIdPair(
-                        email,
-                        messageId
+                    email,
+                    messageId
                 );
             }
         }
