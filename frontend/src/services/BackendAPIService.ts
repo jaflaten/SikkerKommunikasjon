@@ -3,7 +3,7 @@ class BackendAPIService {
   static readonly MultiPartURL =
     BackendAPIService.RootURL + "/v1/messages/multipart";
 
-  public static async postForm(formdata: FormData) {
+  public static async postForm(formdata: FormData): Promise<Response> {
     const requestOptions = {
       method: "POST",
       body: formdata,
@@ -12,7 +12,7 @@ class BackendAPIService {
     console.log("Trying to post: ");
     console.log(BackendAPIService.MultiPartURL);
 
-    return await fetch(BackendAPIService.MultiPartURL, requestOptions);
+    return fetch(BackendAPIService.MultiPartURL, requestOptions);
   }
 }
 
