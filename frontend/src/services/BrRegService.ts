@@ -27,7 +27,7 @@ class BrRegService {
         let embedded = jo["_embedded"];
         return embedded ? embedded["enheter"] : [];
       })
-      .catch((e) => []);
+      .catch((_e) => []);
   };
 
   private static searchSubByNameAsync = (inputValue: string) => {
@@ -38,7 +38,7 @@ class BrRegService {
         let embedded = jo["_embedded"];
         return embedded ? embedded["underenheter"] : [];
       })
-      .catch((e) => []);
+      .catch((_e) => []);
   };
 
   /**
@@ -81,7 +81,7 @@ class BrRegService {
   };
 
   private static fetchSingleOrgFromUrl = async (_url: string) => {
-    let responseJson = await fetch(_url).then((res) => {
+    return await fetch(_url).then((res) => {
       if (res.status === 404) {
         return {
           navn: "Fant ikke organisasjonsnr",
@@ -96,7 +96,6 @@ class BrRegService {
         return res.json();
       }
     });
-    return responseJson;
   };
 
   private static getOrgSubEntityAsync = async (orgNr: string) => {

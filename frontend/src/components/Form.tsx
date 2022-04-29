@@ -34,7 +34,7 @@ const Form = () => {
   /**
    * Regex to check if valid organisation number Norway
    */
-  const orgNrRegex = /^([0-9]{4}:)?([0-9]{9})$/;
+  const orgNrRegex = /^(\d{4}:)?(\d{9})$/;
 
   /**
    * Handles the Receiver Searchbar InputChange
