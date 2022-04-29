@@ -81,7 +81,7 @@ class BrRegService {
   };
 
   private static fetchSingleOrgFromUrl = async (_url: string) => {
-    return await fetch(_url).then((res) => {
+    return fetch(_url).then((res) => {
       if (res.status === 404) {
         return {
           navn: "Fant ikke organisasjonsnr",
