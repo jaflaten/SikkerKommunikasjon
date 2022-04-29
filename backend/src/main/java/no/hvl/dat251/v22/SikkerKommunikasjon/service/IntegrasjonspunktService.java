@@ -29,6 +29,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 public class IntegrasjonspunktService {
+
     private static String EFORMIDLING_AUTHORITY = "iso6523-actorid-upis";
     private static String TYPE_VERSION = "1.0";
     private static String HEADER_VERSION = "1.0";
@@ -36,6 +37,7 @@ public class IntegrasjonspunktService {
     ObjectMapper mapper = new ObjectMapper();
     private final IntegrasjonspunktClient client;
     private final SikkerKommunikasjonProperties properties;
+    private final EmailService emailService;
 
 
     public Optional<JsonNode> getCapabilities(String identifier) throws JsonProcessingException {
@@ -160,7 +162,7 @@ public class IntegrasjonspunktService {
                         .findFirst();
 
         if (attachment.isPresent()) {
-            String email = EmailService.findEmail(attachment.get().getContent());
+            String email = emailService.findEmail(attachment.get().getContent());
             if (email == null) {
                 log.error("Could not find email in attachment.");
                 return;
@@ -168,7 +170,7 @@ public class IntegrasjonspunktService {
 
             if (!email.equals("") && !messageId.equals("")) {
                 // Cache the messageId along with the user email
-                EmailService.addEmailMessageIdPair(
+                emailService.addEmailMessageIdPair(
                         email,
                         messageId
                 );
