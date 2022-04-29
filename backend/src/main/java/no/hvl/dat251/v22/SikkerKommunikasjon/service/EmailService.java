@@ -26,27 +26,26 @@ public class EmailService {
     /**
      * The email sikkerkommunikasjon sends it's emails from
      */
-    public static final String SIKKERKOMMUNIKASJON_EMAIL = "sikkerkomm@protonmail.com";
+    private final String SIKKERKOMMUNIKASJON_EMAIL = "sikkerkomm@protonmail.com";
 
     /**
      * Stores emails, with given message_id as key.
-     * Only lives as long as program lives.
      */
-    public static final Dictionary<String, String> MESSAGEID_TO_EMAIL = new Hashtable<>();
+    private final Dictionary<String, String> cache = new Hashtable<>();
 
     /**
-     * If the email service is operational, e.g. correct api-keys are set
+     * If the email service is operational, e.g. correct api-keys are set.
      */
     private boolean isEnabled;
 
     private MailjetClient client;
 
-    public static void addEmailMessageIdPair(String email, String messageId) {
-        MESSAGEID_TO_EMAIL.put(messageId, email);
+    public void addEmailMessageIdPair(String email, String messageId) {
+        cache.put(messageId, email);
     }
 
-    public static String emailFromMessageId(String messageId) {
-        return MESSAGEID_TO_EMAIL.get(messageId);
+    public String emailFromMessageId(String messageId) {
+        return cache.get(messageId);
     }
 
     @Autowired
@@ -107,7 +106,7 @@ public class EmailService {
     }
 
     /** Procedure for finding email is from: https://stackoverflow.com/a/15703751 **/
-    public static String findEmail(String s) {
+    public String findEmail(String s) {
         Matcher matcher = Pattern.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
                 .matcher(s);
 

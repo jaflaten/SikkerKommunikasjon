@@ -33,8 +33,7 @@ import java.util.Optional;
 @RequestMapping("/api/v1")
 public class IntegrasjonspunktController {
 
-    private final IntegrasjonspunktService
-            service;
+    private final IntegrasjonspunktService service;
 
     @CrossOrigin
     @GetMapping("/capabilities/{orgnr}")

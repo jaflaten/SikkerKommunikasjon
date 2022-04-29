@@ -31,7 +31,7 @@ public class MessageStatusService {
 
         // Get email from messageId
         String messageId = messageStatus.getId();
-        String email = EmailService.emailFromMessageId(messageId);
+        String email = emailService.emailFromMessageId(messageId);
 
         // notify associated user about the updated status
         emailService.sendSimpleEmail(
