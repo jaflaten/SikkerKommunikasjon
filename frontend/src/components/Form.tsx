@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AsyncSelect from "react-select/async";
 import BrRegService from "../services/BrRegService";
+import BackendAPIService from "../services/BackendAPIService";
 
 interface IFormData {
   ssn: string;
@@ -109,18 +110,13 @@ const Form = () => {
    * Submit form action
    */
   const submit = () => {
-    const requestOptions = {
-      method: "POST",
-      body: new FormData(document.getElementById("form") as HTMLFormElement),
-    };
-    const _url = process.env.REACT_APP_API_URL + "/v1/messages/multipart";
-    console.log("Trying to post: ");
-    console.log(_url);
-
-    fetch(_url, requestOptions)
+    BackendAPIService.postForm(
+      new FormData(document.getElementById("form") as HTMLFormElement)
+    )
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
+
         alert("Melding har blitt sendt, du blir sendt til fremsiden");
         window.location.assign("/");
       })
