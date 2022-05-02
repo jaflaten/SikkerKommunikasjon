@@ -26,7 +26,7 @@ public class EmailService {
     /**
      * The email sikkerkommunikasjon sends it's emails from
      */
-    private final String SIKKERKOMMUNIKASJON_EMAIL = "sikkerkomm@protonmail.com";
+    private final String SIKKERKOMMUNIKASJON_EMAIL = "sikker.komm@protonmail.com";
 
     /**
      * Stores emails, with given message_id as key.
